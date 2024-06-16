@@ -22,9 +22,9 @@ namespace KoboldTgBot.TgBot
         {
             var result = await action.ExecuteAsync();
 
-            if (!result.status && result.error is not null)
+            if (!result.Status && result.Error is not null)
             {
-                result.error.Log();
+                result.Error.Log();
             }
         }
 
