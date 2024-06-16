@@ -16,8 +16,8 @@ namespace KoboldTgBot.TgBot.Actions.Commands
             {
                 new KeyboardButton("/clear"),
                 new KeyboardButton("/regen"),
-                new KeyboardButton("/edit")
-              
+                new KeyboardButton("/edit"),
+                new KeyboardButton("/role")
             });
 
             keyboard.ResizeKeyboard = true;

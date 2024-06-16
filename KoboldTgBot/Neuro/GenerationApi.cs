@@ -7,11 +7,11 @@ namespace KoboldTgBot.Neuro
 {
     internal static class GenerationApi
     {
-        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, ushort maxContextLength = 8192, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
+        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
         {
             try
             {
-                if (attempts < 1)
+                if (!Convert.ToBoolean(attempts))
                 {
                     return "._.";
                 }
@@ -20,17 +20,18 @@ namespace KoboldTgBot.Neuro
 
                 http.Timeout = TimeSpan.FromMinutes(20);
 
-                var endpoint = ConfigurationManager.GetNeuroApiEndpoint() + "generate";
+                var endpoint = ConfigurationManager.GetNeuroApiEndpoint() + "completions";
 
+
+                prompt = Extensions.RemoveEmojis(prompt);
                 var request = new
                 {
-                    max_context_length = maxContextLength,
-                    max_length = maxLength,
+                    max_tokens = maxLength,
                     prompt = prompt,
-                    quiet = false,
-                    rep_pen = repetitionPenalty,
+                    repetition_penalty = repetitionPenalty,
                     temperature = temperature,
-                    top_p = topPSampling
+                    top_p = topPSampling,
+                    stop = new[] { "### Instruction:", "### Response:" } 
                 };
 
                 var json = JsonConvert.SerializeObject(request);
@@ -42,16 +43,16 @@ namespace KoboldTgBot.Neuro
 
                 var data = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
 
-                string? text = data.results[0].text;
+                string? text = data?.choices[0].text;
 
                 if (string.IsNullOrEmpty(text))
                 {
-                    throw new LLMEmptyAnswerException(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty);
+                    throw new LLMEmptyAnswerException(prompt, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
                 if (!AnswerValidation.Validate(text))
                 {
-                    throw new LLMAnswerValidationException(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty);
+                    throw new LLMAnswerValidationException(prompt, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
                 return AnswerFilering.Process(text);
@@ -59,7 +60,7 @@ namespace KoboldTgBot.Neuro
             catch (Exception ex)
             {
                 ex.Log();
-                return await GenerateAsync(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
+                return await GenerateAsync(prompt, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
             }
         }
     }

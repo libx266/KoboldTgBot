@@ -24,10 +24,13 @@ namespace KoboldTgBot.Utils
             internal bool Compile(bool mustBe) => mustBe ? _validators.All(p => p(_answer)) : !_validators.Any(p => p(_answer));
         }
 
-        internal static bool Validate(string answer) => new AnswerValidator(answer)
+        internal static bool Validate(string answer) => true;
+            /*
+            new AnswerValidator(answer)
             .Check(s => s.Contains("### Instruction:"))
             .Check(s => s.Contains("### Response:"))
             .Compile(false);
+            */
             
     }
 }

@@ -2,6 +2,8 @@
 using KoboldTgBot.Neuro;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Utils
@@ -56,5 +58,26 @@ namespace KoboldTgBot.Utils
 
             return String.Format(Properties.Resources.NeuroCharacterPrompt, roles!.GetPrompt(chatId), String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
         }
+
+
+        private static IEnumerable<char> FilterEmojis(string text)
+        {
+            foreach(var c in text)
+            {
+                if
+                (
+                    (c >= 0x400 && c <= 0x491) || // Кириллица
+                             c <= 0x7E         ||   // ASCII
+                    (c >= 0xA1 && c <= 0xFF)      //дополнения к латинице
+                )
+                {
+                    yield return c;
+                }
+            }
+        }
+
+        public static string RemoveEmojis(string text) => 
+            String.Join("", FilterEmojis(text));
+            
     }
 }
