@@ -31,7 +31,7 @@ namespace KoboldTgBot.Neuro
                     repetition_penalty = repetitionPenalty,
                     temperature = temperature,
                     top_p = topPSampling,
-                    stop = new[] { "### Instruction:", "### Response:" } 
+                    stop = new[] { "### Instruction:", "### Response:", "assistant" } 
                 };
 
                 var json = JsonConvert.SerializeObject(request);

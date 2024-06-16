@@ -21,7 +21,12 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             roles!.SetRole(_callback.Message.Chat.Id, Data);
 
-            await _bot.SendTextMessageAsync(_callback.Message.Chat.Id, "Роль применена");
+            await _bot.SendTextMessageAsync(_callback.Message.Chat.Id, Data switch
+            {
+                NeuroCharacterRoleManager.Science => "Служу прогрессу!",
+                NeuroCharacterRoleManager.ChitChat => "Ня!",
+                NeuroCharacterRoleManager.Imperial => "Слава Империи!"
+            });
             await _bot.DeleteMessageAsync(_callback.Message.Chat.Id, _callback.Message.MessageId);
         }
     }
