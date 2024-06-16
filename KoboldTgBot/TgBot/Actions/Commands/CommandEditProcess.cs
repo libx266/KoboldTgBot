@@ -5,15 +5,17 @@ using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandEditProcess : CommandEditPrepare
+    internal sealed class CommandEditProcess : TgCommandBase
     {
-        public CommandEditProcess(ITelegramBotClient bot, Message message, StateMachineEdit smEdit) : base(bot, message, smEdit)
+        public CommandEditProcess(ITelegramBotClient bot, Message message) : base(bot, message)
         {
         }
 
         protected override async Task WorkAsync()
         {
-            _smEdit.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
+            var smEdit = _data as StateMachineEdit;
+
+            smEdit.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
 
             using var db = new DataContext();
 
@@ -36,12 +38,12 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await db.SaveChangesAsync();
 
-                foreach(int m in _smEdit.GetMessagesToDelete(_message.Chat.Id))
+                foreach(int m in smEdit.GetMessagesToDelete(_message.Chat.Id))
                 {
                     await _bot.DeleteMessageAsync(_message.Chat.Id, m);
                 }
 
-                _smEdit.DisableState(_message.Chat.Id);
+                smEdit.DisableState(_message.Chat.Id);
             }
         }
     }

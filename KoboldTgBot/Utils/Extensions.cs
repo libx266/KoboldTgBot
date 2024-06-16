@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Neuro;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
@@ -10,13 +11,13 @@ namespace KoboldTgBot.Utils
         internal static void Log(this Exception ex) =>
             Task.Run(() => Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented)));
 
-        internal static async Task<string> ConstructPropmptAsync(this DataContext db, long chatId, User user)
+        internal static async Task<string> ConstructPropmptAsync(this DataContext db, long chatId, User? user, NeuroCharacterRoleManager? roles)
         {
             var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory).OrderByDescending(m => m.ID).Take(byte.MaxValue).ToListAsync();
 
             string senderName;
 
-            if (string.IsNullOrWhiteSpace(senderName = user.FirstName ?? "" + ' ' + user.LastName ?? ""))
+            if (string.IsNullOrWhiteSpace(senderName = user!.FirstName ?? "" + ' ' + user.LastName ?? ""))
             {
                 senderName = user.Username ?? "Anonymous";
             }
@@ -53,7 +54,7 @@ namespace KoboldTgBot.Utils
 
             dialog.Reverse();
 
-            return String.Format(Properties.Resources.NeuroCharacterPrompt, String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
+            return String.Format(Properties.Resources.NeuroCharacterPrompt, roles!.GetPrompt(chatId), String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await db.SaveChangesAsync();
 
-                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From);
+                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From, _data as NeuroCharacterRoleManager);
 
                 string answer = "Произошла ошибка, извините пожалуйста!";
 

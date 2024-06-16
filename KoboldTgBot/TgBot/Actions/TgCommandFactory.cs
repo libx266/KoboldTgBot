@@ -1,12 +1,13 @@
-﻿using Telegram.Bot;
+﻿using System.Reflection;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions
 {
-    internal class TgCommandFactory
+    internal sealed class TgCommandFactory
     {
-        protected readonly ITelegramBotClient _bot;
-        protected readonly Message _message;
+        private readonly ITelegramBotClient _bot;
+        private readonly Message _message;
 
         internal TgCommandFactory(ITelegramBotClient bot, Message message)
         {
@@ -14,10 +15,14 @@ namespace KoboldTgBot.TgBot.Actions
             _message = message;
         }
 
-        internal virtual T CreateComand<T>() where T : TgCommandBase
+        internal T CreateComand<T>(object? data = default) where T : TgCommandBase
         {
             var constructor = typeof(T).GetConstructor(new[] { typeof(ITelegramBotClient), typeof(Message) });
-            return (T)constructor.Invoke(new object[] { _bot, _message });
+            var result = (T)constructor!.Invoke(new object[] { _bot, _message });
+
+            typeof(T).GetField("_data", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(result, data);
+
+            return result;
         }
     }
 }

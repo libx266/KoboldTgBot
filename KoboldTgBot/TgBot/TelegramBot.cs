@@ -1,4 +1,6 @@
-﻿using KoboldTgBot.TgBot.Actions;
+﻿using KoboldTgBot.Neuro;
+using KoboldTgBot.TgBot.Actions;
+using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.TgBot.States;
 using KoboldTgBot.Utils;
@@ -12,14 +14,18 @@ namespace KoboldTgBot.TgBot
         private readonly ITelegramBotClient _bot;
         private readonly string _token;
         private readonly StateMachineEdit _smEdit = new();
+        private readonly NeuroCharacterRoleManager _roles = new();
 
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
 
         internal void StartPooling() => _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
 
-        private async Task ExecuteAction(TgActionBase action)
+        private async Task ExecuteAction(TgActionBase? action)
         {
+            if (action is null)
+                return;
+
             var result = await action.ExecuteAsync();
 
             if (!result.Status && result.Error is not null)
@@ -34,13 +40,13 @@ namespace KoboldTgBot.TgBot
             {
                 var factory = new TgCommandFactory(_bot, message);
                
-                TgCommandBase cmd = factory.CreateComand<CommandChat>();
+                TgCommandBase cmd = factory.CreateComand<CommandChat>(_roles);
 
                 if (_smEdit.IsEnable(message.Chat.Id, out var state))
                 {
                     cmd = state switch
                     {
-                        StateEdit.Process => new CommandEditProcess(_bot, message, _smEdit)
+                        StateEdit.Process => factory.CreateComand<CommandEditProcess>(_smEdit)
                     };
                 }
 
@@ -50,8 +56,9 @@ namespace KoboldTgBot.TgBot
                     {
                         "/start" => factory.CreateComand<CommandStart>(),
                         "/clear" => factory.CreateComand<CommandClear>(),
-                        "/regen" => factory.CreateComand<CommandRegen>(),
-                        "/edit" => new CommandEditPrepare(_bot, message, _smEdit),
+                        "/role" => factory.CreateComand<CommandRole>(),
+                        "/regen" => factory.CreateComand<CommandRegen>(_roles),
+                        "/edit" => factory.CreateComand<CommandEditPrepare>(_smEdit),
                         _ => factory.CreateComand<CommandUnknown>()
                     };
                 }
@@ -62,9 +69,15 @@ namespace KoboldTgBot.TgBot
 
         private async Task HandleCallbackAsync(CallbackQuery callback)
         {
-            var parts = callback.Data.Split('=');
+            var factory = new TgCallbackFactory(_bot, callback);
 
-            throw new NotImplementedException();
+            TgCallbackBase? clb = callback.Data.Split('=').FirstOrDefault() switch
+            {
+                "role" => factory.CreateCallback<CallbackRole>(_roles),
+                _ => default
+            };
+
+            await ExecuteAction(clb);
         }
 
         private async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)

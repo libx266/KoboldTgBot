@@ -49,6 +49,11 @@ namespace KoboldTgBot.Neuro
                     throw new LLMEmptyAnswerException(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty);
                 }
 
+                if (!AnswerValidation.Validate(text))
+                {
+                    throw new LLMAnswerValidationException(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty);
+                }
+
                 return AnswerFilering.Process(text);
             }
             catch (Exception ex)
