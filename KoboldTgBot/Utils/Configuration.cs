@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KoboldTgBot.Utils
 {
-    public abstract class ConfigurationManager
+    public static class ConfigurationManager
     {
         private class Params
         {
