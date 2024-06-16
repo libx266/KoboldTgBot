@@ -1,15 +1,8 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Neuro;
 using KoboldTgBot.Utils;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {

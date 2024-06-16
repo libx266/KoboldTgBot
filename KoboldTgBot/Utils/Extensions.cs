@@ -1,12 +1,6 @@
 ﻿using KoboldTgBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Utils
@@ -31,7 +25,7 @@ namespace KoboldTgBot.Utils
             (
                 from m in messages
                 group m by m.TgId into mg
-                let m2 = mg.OrderByDescending(m => m.ID).First()
+                let m2 = mg.MaxBy(m => m.ID)
                 orderby m2.ID descending
                 select new
                 {

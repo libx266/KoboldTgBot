@@ -1,16 +1,7 @@
-﻿using KoboldTgBot.Database;
-using KoboldTgBot.Neuro;
-using KoboldTgBot.TgBot.Actions;
+﻿using KoboldTgBot.TgBot.Actions;
 using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.TgBot.States;
 using KoboldTgBot.Utils;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

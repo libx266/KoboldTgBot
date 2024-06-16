@@ -1,12 +1,4 @@
-﻿using KoboldTgBot.TgBot.Actions;
-using KoboldTgBot.TgBot.Actions.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KoboldTgBot.TgBot.States
+﻿namespace KoboldTgBot.TgBot.States
 {
     internal class StateMachineEdit : StateMachineBase<StateEdit>
     {
