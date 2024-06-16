@@ -7,7 +7,7 @@ namespace KoboldTgBot.Neuro
 {
     internal static class GenerationApi
     {
-        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, ushort maxContextLength = 8192, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 10)
+        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, ushort maxContextLength = 8192, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
         {
             try
             {
