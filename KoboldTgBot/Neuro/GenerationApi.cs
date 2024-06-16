@@ -12,10 +12,15 @@ namespace KoboldTgBot.Neuro
 {
     internal static class GenerationApi
     {
-        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 512, ushort maxContextLength = 8192, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f)
+        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, ushort maxContextLength = 8192, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 10)
         {
             try
             {
+                if (attempts < 1)
+                {
+                    return "._.";
+                }
+
                 using var http = new HttpClient();
 
                 http.Timeout = TimeSpan.FromMinutes(20);
@@ -54,7 +59,7 @@ namespace KoboldTgBot.Neuro
             catch (Exception ex)
             {
                 ex.Log();
-                return await GenerateAsync(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty);
+                return await GenerateAsync(prompt, maxLength, maxContextLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
             }
         }
     }

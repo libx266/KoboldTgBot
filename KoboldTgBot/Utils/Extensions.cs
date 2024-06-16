@@ -45,15 +45,16 @@ namespace KoboldTgBot.Utils
 
             foreach (var m in actualFilteredMessages)
             {
-                if (count > 16384)
+                string row = $"{new[] { senderName, Properties.Resources.BotName }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
+
+                count += row.Length;
+
+                if (count > 21504)
                 {
                     break;
                 }
 
-                string row = $"{new[] { senderName, Properties.Resources.BotName }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
-
                 dialog.Add(row);
-                count += row.Length;
             }
 
             dialog.Reverse();

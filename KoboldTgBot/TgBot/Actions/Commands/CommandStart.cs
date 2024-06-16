@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
@@ -14,7 +15,20 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
         }
 
-        protected override async Task WorkAsync() =>
-            await _bot.SendTextMessageAsync(_message.Chat.Id, Properties.Resources.StartMessage);
+        protected override async Task WorkAsync()
+        {
+            var keyboard = new ReplyKeyboardMarkup(new KeyboardButton[]
+            {
+                new KeyboardButton("/clear"),
+                new KeyboardButton("/regen"),
+                new KeyboardButton("/edit")
+              
+            });
+
+            keyboard.ResizeKeyboard = true;
+
+            await _bot.SendTextMessageAsync(_message.Chat.Id, Properties.Resources.StartMessage, replyMarkup: keyboard);
+        }
+            
     }
 }

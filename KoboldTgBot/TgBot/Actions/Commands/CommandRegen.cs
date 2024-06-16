@@ -30,7 +30,20 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From);
 
-                string answer = await GenerationApi.GenerateAsync(prompt, 1024, 8192);
+                string answer = "Произошла ошибка, извините пожалуйста!";
+
+                var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt));
+
+                var typing = Task.Run(async () =>
+                {
+                    while (!generation.IsCompleted)
+                    {
+                        await _bot.SendChatActionAsync(_message.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.Typing);
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                    }
+                });
+
+                await Task.WhenAny(generation, typing);
 
                 await _bot.EditMessageTextAsync(_message.Chat.Id, (int)lastMessage.TgId, answer);
 

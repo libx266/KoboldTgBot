@@ -27,7 +27,7 @@ namespace KoboldTgBot.Utils
         }
 
         internal static string Process(string asnwer) => asnwer
-            .ReplaceBadSymbols()
+          //  .ReplaceBadSymbols()
             .ReplaceGender();
 
             

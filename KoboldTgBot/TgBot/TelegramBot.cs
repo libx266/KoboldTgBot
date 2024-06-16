@@ -25,7 +25,7 @@ namespace KoboldTgBot.TgBot
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
 
-        internal void StartPooling() => _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => Console.WriteLine(ex.Message)));
+        internal void StartPooling() => _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
 
         private async Task ExecuteAction(TgActionBase action)
         {
