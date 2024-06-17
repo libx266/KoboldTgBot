@@ -39,7 +39,6 @@ namespace KoboldTgBot.Neuro
 
             foreach (var m in actualFilteredMessages)
             {
-            {
                 string row = $"{new[] { senderName, Properties.Resources.BotName }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
 
                 count += row.Length;
