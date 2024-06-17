@@ -44,6 +44,8 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                     await _bot.DeleteMessageAsync(_message.Chat.Id, m);
                 }
 
+                smEdit.ClearMessagesToDelete(_message.Chat.Id);
+
                 smEdit.DisableState(_message.Chat.Id);
             }
         }

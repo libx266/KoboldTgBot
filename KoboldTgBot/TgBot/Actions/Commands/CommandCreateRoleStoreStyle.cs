@@ -43,6 +43,8 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 }
             }
 
+            smCreateRole.ClearMessagesToDelete(_message.Chat.Id);
+
             await _bot.SendTextMessageAsync(_message.Chat.Id, "Создана роль:  " + role.Title);
         }
     }

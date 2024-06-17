@@ -20,6 +20,8 @@
 
         internal List<int> GetMessagesToDelete(long chatId) => MessagesToDelete[chatId];
 
+        internal void ClearMessagesToDelete(long chatId) => MessagesToDelete.Remove(chatId);
+
         internal void CreateState(T state, long chatId) => CurrentStates[chatId] = state;
 
         internal void DisableState(long chatId) => CurrentStates.Remove(chatId);

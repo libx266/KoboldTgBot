@@ -76,7 +76,7 @@ namespace KoboldTgBot.Neuro
             );
         }
 
-        internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
+        internal static async Task<string> GenerateAsync(string prompt, string botName, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
         {
             try
             {
@@ -119,12 +119,14 @@ namespace KoboldTgBot.Neuro
                     throw new LLMEmptyAnswerException(prompt, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
-                return text;
+                using var db = new DataContext();
+
+                return text.Replace(botName + ':', "");
             }
             catch (Exception ex)
             {
                 ex.Log();
-                return await GenerateAsync(prompt, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
+                return await GenerateAsync(prompt, botName, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
             }
         }
     }

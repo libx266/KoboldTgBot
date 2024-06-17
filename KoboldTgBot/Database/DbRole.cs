@@ -24,9 +24,9 @@ namespace KoboldTgBot.Database
         public string Charakter { get; set; } = null!;
         [MaxLength(1024)]
         public string Specialisation { get; set; } = null!;
-        [MaxLength(512)]
+        [MaxLength(1024)]
         public string Relation { get; set; } = null!;
-        [MaxLength(512)]
+        [MaxLength(1024)]
         public string Style { get; set; } = null!;
     }
 }
