@@ -37,9 +37,17 @@ namespace KoboldTgBot.Neuro
             var dialog = new List<string>();
             int count = 0;
 
+            var role = await
+            (
+                from cr in db.CurrentRoles.Where(cr => cr.ChatId == chatId).DefaultIfEmpty()
+                from r in db.Roles
+                where r.ID == (cr == default ? 1 : cr.RoleId)
+                select r
+            ).FirstAsync();
+
             foreach (var m in actualFilteredMessages)
             {
-                string row = $"{new[] { senderName, Properties.Resources.BotName }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
+                string row = $"{new[] { senderName, role.Name }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
 
                 count += row.Length;
 
@@ -53,13 +61,7 @@ namespace KoboldTgBot.Neuro
 
             dialog.Reverse();
 
-            var role = await
-            (
-                from cr in db.CurrentRoles.Where(cr => cr.ChatId == chatId).DefaultIfEmpty()
-                from r in db.Roles
-                where r.ID == (cr == default ? 1 : cr.RoleId)
-                select r
-            ).FirstAsync();
+           
 
             return String.Format
             (
