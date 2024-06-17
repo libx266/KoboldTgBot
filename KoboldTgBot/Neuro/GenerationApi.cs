@@ -94,6 +94,8 @@ namespace KoboldTgBot.Neuro
 
                 var endpoint = ConfigurationManager.GetNeuroApiEndpoint() + "completions";
 
+                var stop = new[] { "### Instruction:", "### Response:", "assistant", prompt.BotName + ':', prompt.UserName + ':' };
+
                 var request = new
                 {
                     max_tokens = maxLength,
@@ -101,7 +103,7 @@ namespace KoboldTgBot.Neuro
                     repetition_penalty = repetitionPenalty,
                     temperature = temperature,
                     top_p = topPSampling,
-                    stop = new[] { "### Instruction:", "### Response:", "assistant", prompt.BotName + ':', prompt.UserName + ':' } 
+                    stop = stop 
                 };
 
                 var json = JsonConvert.SerializeObject(request);
@@ -115,9 +117,18 @@ namespace KoboldTgBot.Neuro
 
                 string? text = data?.choices[0].text;
 
+                var ex = new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
+
                 if (string.IsNullOrEmpty(text))
                 {
-                    throw new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
+                    throw ex;
+                }
+
+                stop.ToList().ForEach(s => text = text.Replace(s, ""));
+
+                if (text.Length < 3)
+                {
+                    throw ex;
                 }
 
                 return text;
