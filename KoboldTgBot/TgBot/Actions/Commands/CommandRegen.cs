@@ -33,15 +33,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 string answer = "Произошла ошибка, извините пожалуйста!";
 
-                var botName = await
-                (
-                    from cr in db.CurrentRoles.Where(cr => cr.ChatId == _message.Chat.Id).DefaultIfEmpty()
-                    from r in db.Roles
-                    where r.ID == (cr == default ? 1 : cr.RoleId)
-                    select r.Name
-                ).FirstAsync();
-
-                var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt, botName));
+                var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt));
 
                 var typing = Task.Run(async () =>
                 {
