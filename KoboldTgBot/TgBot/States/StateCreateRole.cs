@@ -2,7 +2,12 @@
 {
     internal enum StateCreateRole
     {
+        Title,
         Name,
-        Description
+        Gender,
+        Charakter,
+        Specialisation,
+        Relation,
+        Style
     }
 }

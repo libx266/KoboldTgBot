@@ -26,11 +26,11 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 select new
                 {
                     r.ID,
-                    r.Name
+                    r.Title
                 }
             ).ToListAsync();
 
-            var buttons = roles.Select(r => new InlineKeyboardButton[] { new InlineKeyboardButton(r.Name) { CallbackData = "role=" + r.ID } });
+            var buttons = roles.Select(r => new InlineKeyboardButton[] { new InlineKeyboardButton(r.Title) { CallbackData = "role=" + r.ID } });
 
             var keyboard = new InlineKeyboardMarkup(buttons.Append(new InlineKeyboardButton[] { new InlineKeyboardButton("Добавить") { CallbackData = "create_role=" } }));
 

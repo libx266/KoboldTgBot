@@ -53,15 +53,25 @@ namespace KoboldTgBot.Neuro
 
             dialog.Reverse();
 
-            var role =
+            var role = await
             (
                 from cr in db.CurrentRoles.Where(cr => cr.ChatId == chatId).DefaultIfEmpty()
                 from r in db.Roles
                 where r.ID == (cr == default ? 1 : cr.RoleId)
-                select r.Description
-            );
+                select r
+            ).FirstAsync();
 
-            return String.Format(Properties.Resources.NeuroCharacterPrompt, await role.FirstOrDefaultAsync() ?? Properties.Resources.NeuroCharacterSciencePrompt, String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
+            return String.Format
+            (
+                Properties.Resources.NeuroCharacterPrompt,
+                role.Name, 
+                role.Gender,
+                role.Charakter, 
+                role.Specialisation,
+                role.Relation,
+                role.Style, 
+                String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  "))
+            );
         }
 
         internal static async Task<string> GenerateAsync(string prompt, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
@@ -107,12 +117,7 @@ namespace KoboldTgBot.Neuro
                     throw new LLMEmptyAnswerException(prompt, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
-                if (!AnswerValidation.Validate(text))
-                {
-                    throw new LLMAnswerValidationException(prompt, maxLength, temperature, topPSampling, repetitionPenalty);
-                }
-
-                return AnswerFilering.Process(text);
+                return text;
             }
             catch (Exception ex)
             {

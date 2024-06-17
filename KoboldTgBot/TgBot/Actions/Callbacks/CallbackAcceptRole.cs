@@ -37,7 +37,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             await db.SaveChangesAsync();
 
-            await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Name).FirstAsync());
+            await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Title).FirstAsync());
         }
     }
 }

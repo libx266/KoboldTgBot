@@ -13,7 +13,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
         protected override async Task WorkAsync()
         {
-            int roleId = Int32.Parse(Data);
+            int roleId = Int32.Parse(Data!);
 
             using var db = new DataContext();
 
@@ -21,7 +21,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
             db.Roles.Remove(role);
             await db.SaveChangesAsync();
 
-            await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Удалена роль:  " + role.Name);
+            await _bot.EditMessageTextAsync(_callback.Message!.Chat.Id, _callback.Message.MessageId, "Удалена роль:  " + role.Title);
         }
     }
 }

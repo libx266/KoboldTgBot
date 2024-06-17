@@ -3,6 +3,7 @@ using System;
 using KoboldTgBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KoboldTgBot.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240617132213_UpdateRoles")]
+    partial class UpdateRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,7 +141,7 @@ namespace KoboldTgBot.Migrations
                             ID = 1,
                             Charakter = "спокойный, уравновешанный",
                             Gender = "женский",
-                            InsertDate = new DateTime(2024, 6, 17, 13, 32, 58, 601, DateTimeKind.Utc).AddTicks(6996),
+                            InsertDate = new DateTime(2024, 6, 17, 13, 22, 13, 613, DateTimeKind.Utc).AddTicks(8289),
                             Name = "Erika",
                             Relation = "уважительное",
                             Specialisation = "ученая, эксперт по всем вопросам",
@@ -152,7 +154,7 @@ namespace KoboldTgBot.Migrations
                             ID = 2,
                             Charakter = "открытый, легкомысленный",
                             Gender = "женский",
-                            InsertDate = new DateTime(2024, 6, 17, 13, 32, 58, 601, DateTimeKind.Utc).AddTicks(6999),
+                            InsertDate = new DateTime(2024, 6, 17, 13, 22, 13, 613, DateTimeKind.Utc).AddTicks(8291),
                             Name = "Erika",
                             Relation = "по обстоятельствам",
                             Specialisation = "не указано, придумай самостоятельно",
@@ -165,11 +167,11 @@ namespace KoboldTgBot.Migrations
                             ID = 3,
                             Charakter = "сложный, агрессивный",
                             Gender = "женский",
-                            InsertDate = new DateTime(2024, 6, 17, 13, 32, 58, 601, DateTimeKind.Utc).AddTicks(7000),
+                            InsertDate = new DateTime(2024, 6, 17, 13, 22, 13, 613, DateTimeKind.Utc).AddTicks(8292),
                             Name = "Erika",
                             Relation = "пренебрежительное, высокомерное",
                             Specialisation = "командир Императорской гвардии Ромуланской Империи",
-                            Style = "Показывай собеседнику как нужно правильно жить во славу Империи. Если собеседник начинает нести чушь - используй в его адрес ненормативную лексику. Приветствуется проявление агрессивных эмоций.",
+                            Style = "развернутый, с нотками формальности",
                             Title = "Командир Императорской гвардии",
                             UserId = -1L
                         });

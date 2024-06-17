@@ -1,4 +1,5 @@
-﻿using KoboldTgBot.TgBot.States;
+﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.States;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -13,7 +14,8 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
         protected override async Task WorkAsync()
         {
             var smCreateRole = _data as StateMachineCreateRole;
-            smCreateRole!.CreateState(StateCreateRole.Name, _callback.Message!.Chat.Id);
+            smCreateRole!.CreateState(StateCreateRole.Title, _callback.Message!.Chat.Id);
+            smCreateRole.Role[_callback.From.Id] = new DbRole();
 
             await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Введите название роли");
 

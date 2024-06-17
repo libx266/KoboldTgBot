@@ -1,25 +1,20 @@
-﻿using KoboldTgBot.TgBot.States;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandCreateRoleStoreName : TgCommandBase
+    internal sealed class CommandCreateRoleStoreName : CommandCreateRoleStoreBase
     {
         public CommandCreateRoleStoreName(ITelegramBotClient bot, Message message) : base(bot, message)
         {
         }
 
-        protected override async Task WorkAsync()
-        {
-            var msg = await _bot.SendTextMessageAsync(_message.Chat.Id, "Введите описание роли");
-
-            var smCreateRole = _data as StateMachineCreateRole;
-
-            smCreateRole!.Name[_message.From!.Id] = _message.Text!;
-            smCreateRole.CreateState(StateCreateRole.Description, _message.Chat.Id);
-            smCreateRole.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
-            smCreateRole.AddMessageToDelete(msg.Chat.Id, msg.MessageId);
-        }
+        protected override async Task WorkAsync() =>
+            await Store((role, msg) => role.Name = msg, "Укажите пол вашего персонажа.", States.StateCreateRole.Gender);
     }
 }

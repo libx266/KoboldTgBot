@@ -54,8 +54,13 @@ namespace KoboldTgBot.TgBot
                 {
                     cmd = createRoleState switch
                     {
+                        StateCreateRole.Title => factory.CreateComand<CommandCreateRoleStoreTitle>(_smCreateRole),
                         StateCreateRole.Name => factory.CreateComand<CommandCreateRoleStoreName>(_smCreateRole),
-                        StateCreateRole.Description => factory.CreateComand<CommandCreateRoleStoreDescription>(_smCreateRole),
+                        StateCreateRole.Gender => factory.CreateComand<CommandCreateRoleStoreGender>(_smCreateRole),
+                        StateCreateRole.Charakter => factory.CreateComand<CommandCreateRoleStoreCharakter>(_smCreateRole),
+                        StateCreateRole.Specialisation => factory.CreateComand<CommandCreateRoleStoreSpecialisation>(_smCreateRole),
+                        StateCreateRole.Relation => factory.CreateComand<CommandCreateRoleStoreRelation>(_smCreateRole),
+                        StateCreateRole.Style => factory.CreateComand<CommandCreateRoleStoreStyle>(_smCreateRole),
                         _ => cmd
                     };
                 }

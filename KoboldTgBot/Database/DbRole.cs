@@ -12,11 +12,21 @@ namespace KoboldTgBot.Database
     public sealed class DbRole : BaseEntity
     {
         [MaxLength(64)]
-        public string Name { get; set; } = null!;
-
+        public string Title { get; set; } = null!;
         public long UserId { get; set; }
 
+        [MaxLength(64)]
+        public string Name { get; set; } = null!;
+        [MaxLength(64)]
+        public string Gender { get; set; } = null!;
+
         [MaxLength(1024)]
-        public string Description { get; set; } = null!;
+        public string Charakter { get; set; } = null!;
+        [MaxLength(1024)]
+        public string Specialisation { get; set; } = null!;
+        [MaxLength(512)]
+        public string Relation { get; set; } = null!;
+        [MaxLength(512)]
+        public string Style { get; set; } = null!;
     }
 }

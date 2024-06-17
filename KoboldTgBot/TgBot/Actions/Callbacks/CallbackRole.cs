@@ -24,18 +24,29 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             int roleId = Int32.TryParse(Data, out int r) ? r : 1;
 
-            var role = await db.Roles.Where(r => r.ID == roleId).Select(r => new { Description = r.Description, System = r.UserId == -1L }).FirstAsync();
+            var role = await db.Roles.FirstAsync(r => r.ID == roleId);
 
             var buttons = new List<InlineKeyboardButton> { new InlineKeyboardButton("Применить") { CallbackData = "accept_role=" + roleId } };
 
-            if (!role.System)
+            var info = String.Format
+            (
+                Properties.Resources.RoleViewInfo,
+                role.Name,
+                role.Gender,
+                role.Charakter,
+                role.Specialisation,
+                role.Relation,
+                role.Style
+            );
+
+            if (role.UserId != -1L)
             {
                 buttons.Add(new InlineKeyboardButton("Удалить") { CallbackData = "delete_role=" + roleId });
             }
 
             var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] { buttons.ToArray() });
 
-            await _bot.EditMessageTextAsync(_callback.Message!.Chat.Id, _callback.Message.MessageId, role.Description, replyMarkup: keyboard);
+            await _bot.EditMessageTextAsync(_callback.Message!.Chat.Id, _callback.Message.MessageId, info, replyMarkup: keyboard);
         }
     }
 }
