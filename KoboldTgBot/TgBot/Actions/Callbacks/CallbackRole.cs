@@ -1,4 +1,6 @@
-﻿using KoboldTgBot.Neuro;
+﻿using KoboldTgBot.Database;
+using KoboldTgBot.Neuro;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,16 +19,28 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
         protected override async Task WorkAsync()
         {
-            var roles = _data as NeuroCharacterRoleManager;
+            using var db = new DataContext();
 
-            roles!.SetRole(_callback.Message.Chat.Id, Data);
+            long chatId = _callback.Message.Chat.Id;
+            int roleId = Int32.TryParse(Data, out int r) ? r : 1;
 
-            await _bot.SendTextMessageAsync(_callback.Message.Chat.Id, Data switch
+            var currentRole = await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId);
+            if (currentRole is null)
             {
-                NeuroCharacterRoleManager.Science => "Служу прогрессу!",
-                NeuroCharacterRoleManager.ChitChat => "Ня!",
-                NeuroCharacterRoleManager.Imperial => "Слава Империи!"
-            });
+                await db.CurrentRoles.AddAsync(new DbCurrentRole
+                {
+                    ChatId = chatId,
+                    RoleId = roleId
+                });
+            }
+            else
+            {
+                currentRole.RoleId = roleId;
+            }
+
+            await db.SaveChangesAsync();
+
+            await _bot.SendTextMessageAsync(_callback.Message.Chat.Id, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Name).FirstOrDefaultAsync());
             await _bot.DeleteMessageAsync(_callback.Message.Chat.Id, _callback.Message.MessageId);
         }
     }

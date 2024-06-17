@@ -1,4 +1,6 @@
-﻿using KoboldTgBot.Neuro;
+﻿using KoboldTgBot.Database;
+using KoboldTgBot.Neuro;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +20,25 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
         protected override async Task WorkAsync()
         {
-            var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][]
-            {
-                new InlineKeyboardButton[] {new InlineKeyboardButton("Офицер по науке") { CallbackData = "role=" + NeuroCharacterRoleManager.Science} },
-                new InlineKeyboardButton[] {new InlineKeyboardButton("Старожила аниме бесед") { CallbackData = "role=" + NeuroCharacterRoleManager.ChitChat } },
-                new InlineKeyboardButton[] {new InlineKeyboardButton("Командир Императорской гвардии") { CallbackData = "role=" + NeuroCharacterRoleManager.Imperial } }
-            });
+            using var db = new DataContext();
+
+            long userId = _message.From.Id;
+
+            var roles = await
+            (
+                from r in db.Roles
+                where r.UserId == userId ||
+                r.UserId == -1
+                select new
+                {
+                    r.ID,
+                    r.Name
+                }
+            ).ToListAsync();
+
+            var buttons = roles.Select(r => new InlineKeyboardButton[] { new InlineKeyboardButton(r.Name) { CallbackData = "role=" + r.ID } });
+
+            var keyboard = new InlineKeyboardMarkup(buttons.Append(new InlineKeyboardButton[] { new InlineKeyboardButton("Добавить") { CallbackData = "create_role=" } }));
 
             await _bot.SendTextMessageAsync(_message.Chat.Id, "Выберите роль персонажа:", replyMarkup: keyboard);
         }

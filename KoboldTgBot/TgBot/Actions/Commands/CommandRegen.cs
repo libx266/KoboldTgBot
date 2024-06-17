@@ -1,6 +1,7 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Neuro;
 using KoboldTgBot.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +22,14 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            var lastMessage = db.Messages.Where(m => m.ChatId == _message.Chat.Id && m.InMemory).OrderByDescending(m => m.ID).FirstOrDefault();
+            var lastMessage = await db.Messages.Where(m => m.ChatId == _message.Chat.Id && m.InMemory).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
-            if (lastMessage is not null && lastMessage.SenderId == -1L)
+            if (lastMessage is not null && lastMessage.UserId == -1L)
             {
                 lastMessage.InMemory = false;
                 await db.SaveChangesAsync();
 
-                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From, _data as NeuroCharacterRoleManager);
+                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From);
 
                 string answer = "Произошла ошибка, извините пожалуйста!";
 
@@ -45,12 +46,12 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await Task.WhenAny(generation, typing);
 
-                await _bot.EditMessageTextAsync(_message.Chat.Id, (int)lastMessage.TgId, answer);
+                await _bot.EditMessageTextAsync(_message.Chat.Id, lastMessage.TgId, answer);
 
                 await db.Messages.AddAsync(new DbMessage
                 {
                     ChatId = _message.Chat.Id,
-                    SenderId = -1L,
+                    UserId = -1L,
                     Text = answer,
                     TgId = lastMessage.TgId
                 });

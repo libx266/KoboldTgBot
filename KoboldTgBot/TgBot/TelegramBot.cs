@@ -14,7 +14,6 @@ namespace KoboldTgBot.TgBot
         private readonly ITelegramBotClient _bot;
         private readonly string _token;
         private readonly StateMachineEdit _smEdit = new();
-        private readonly NeuroCharacterRoleManager _roles = new();
 
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
@@ -40,7 +39,7 @@ namespace KoboldTgBot.TgBot
             {
                 var factory = new TgCommandFactory(_bot, message);
                
-                TgCommandBase cmd = factory.CreateComand<CommandChat>(_roles);
+                TgCommandBase cmd = factory.CreateComand<CommandChat>();
 
                 if (_smEdit.IsEnable(message.Chat.Id, out var state))
                 {
@@ -57,7 +56,7 @@ namespace KoboldTgBot.TgBot
                         "/start" => factory.CreateComand<CommandStart>(),
                         "/clear" => factory.CreateComand<CommandClear>(),
                         "/role" => factory.CreateComand<CommandRole>(),
-                        "/regen" => factory.CreateComand<CommandRegen>(_roles),
+                        "/regen" => factory.CreateComand<CommandRegen>(),
                         "/edit" => factory.CreateComand<CommandEditPrepare>(_smEdit),
                         _ => factory.CreateComand<CommandUnknown>()
                     };
@@ -73,7 +72,7 @@ namespace KoboldTgBot.TgBot
 
             TgCallbackBase? clb = callback.Data.Split('=').FirstOrDefault() switch
             {
-                "role" => factory.CreateCallback<CallbackRole>(_roles),
+                "role" => factory.CreateCallback<CallbackRole>(),
                 _ => default
             };
 

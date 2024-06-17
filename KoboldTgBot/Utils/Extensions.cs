@@ -13,7 +13,7 @@ namespace KoboldTgBot.Utils
         internal static void Log(this Exception ex) =>
             Task.Run(() => Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented)));
 
-        internal static async Task<string> ConstructPropmptAsync(this DataContext db, long chatId, User? user, NeuroCharacterRoleManager? roles)
+        internal static async Task<string> ConstructPropmptAsync(this DataContext db, long chatId, User? user)
         {
             var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory).OrderByDescending(m => m.ID).Take(byte.MaxValue).ToListAsync();
 
@@ -33,7 +33,7 @@ namespace KoboldTgBot.Utils
                 select new
                 {
                     Text = m2.Text,
-                    Sender = m2.SenderId
+                    Sender = m2.UserId
                 }
             );
 
@@ -56,7 +56,15 @@ namespace KoboldTgBot.Utils
 
             dialog.Reverse();
 
-            return String.Format(Properties.Resources.NeuroCharacterPrompt, roles!.GetPrompt(chatId), String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
+            var role =
+            (
+                from cr in db.CurrentRoles.Where(cr => cr.ChatId == chatId).DefaultIfEmpty()
+                from r in db.Roles
+                where r.ID == (cr == default ? 1 : cr.RoleId)
+                select r.Description
+            );
+
+            return String.Format(Properties.Resources.NeuroCharacterPrompt, await role.FirstOrDefaultAsync() ?? Properties.Resources.NeuroCharacterSciencePrompt, String.Join("\n", dialog.Append($"{Properties.Resources.BotName}:  ")));
         }
 
 

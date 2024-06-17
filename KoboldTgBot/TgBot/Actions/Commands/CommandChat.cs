@@ -21,14 +21,14 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 await db.Messages.AddAsync(new DbMessage
                 {
                     Text = _message.Text,
-                    SenderId = _message.From.Id,
+                    UserId = _message.From.Id,
                     ChatId = _message.Chat.Id,
                     TgId = _message.MessageId
                 });
 
                 await db.SaveChangesAsync();
 
-                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From, _data as NeuroCharacterRoleManager);
+                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From);
 
                 string answer = "Произошла ошибка, извините пожалуйста!";
 
@@ -50,7 +50,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 await db.Messages.AddAsync(new DbMessage
                 {
                     Text = sendedMessage.Text,
-                    SenderId = -1L,
+                    UserId = -1L,
                     ChatId = sendedMessage.Chat.Id,
                     TgId = sendedMessage.MessageId
                 });

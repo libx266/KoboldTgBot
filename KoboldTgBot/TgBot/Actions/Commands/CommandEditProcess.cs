@@ -1,5 +1,6 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.TgBot.States;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -19,18 +20,18 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
             using var db = new DataContext();
 
-            var lastMessage = db.Messages.Where(m => m.ChatId == _message.Chat.Id && m.InMemory && m.SenderId == -1L).OrderByDescending(m => m.ID).FirstOrDefault();
+            var lastMessage = await db.Messages.Where(m => m.ChatId == _message.Chat.Id && m.InMemory && m.UserId == -1L).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
             if (lastMessage is not null)
             {
-                await _bot.EditMessageTextAsync(lastMessage.ChatId, (int)lastMessage.TgId, _message.Text + "\n\n(изменено пользователем)");
+                await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, _message.Text + "\n\n(изменено пользователем)");
 
                 await db.Messages.AddAsync(new DbMessage
                 {
                     ChatId = _message.Chat.Id,
                     TgId = lastMessage.TgId,
                     Text = _message.Text,
-                    SenderId = lastMessage.SenderId,
+                    UserId = lastMessage.UserId,
                     IsEdited = true
                 });
 
