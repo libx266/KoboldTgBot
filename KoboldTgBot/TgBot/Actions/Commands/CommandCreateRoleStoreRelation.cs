@@ -15,6 +15,6 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         }
 
         protected override async Task WorkAsync() =>
-            await Store((role, msg) => role.Relation = msg, "Какого стиля ведения диалога персонаж должен приедерживаться?", States.StateCreateRole.Style);
+            await Store((role, msg) => role.Relation = msg, "Опишите стиль ведения диалога, которого персонаж должен приедерживаться", States.StateCreateRole.Style);
     }
 }

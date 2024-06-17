@@ -1,5 +1,6 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.TgBot.States;
+using KoboldTgBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -32,7 +33,14 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
             foreach (int m in smCreateRole.GetMessagesToDelete(_message.Chat.Id))
             {
-                await _bot.DeleteMessageAsync(_message.Chat.Id, m);
+                try
+                {
+                    await _bot.DeleteMessageAsync(_message.Chat.Id, m);
+                }
+                catch (Exception ex) 
+                {
+                    ex.Log();
+                }
             }
 
             await _bot.SendTextMessageAsync(_message.Chat.Id, "Создана роль:  " + role.Title);
