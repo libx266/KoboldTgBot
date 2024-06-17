@@ -14,6 +14,7 @@ namespace KoboldTgBot.TgBot
         private readonly ITelegramBotClient _bot;
         private readonly string _token;
         private readonly StateMachineEdit _smEdit = new();
+        private readonly StateMachineCreateRole _smCreateRole = new();
 
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
@@ -41,15 +42,24 @@ namespace KoboldTgBot.TgBot
                
                 TgCommandBase cmd = factory.CreateComand<CommandChat>();
 
-                if (_smEdit.IsEnable(message.Chat.Id, out var state))
+                if (_smEdit.IsEnable(message.Chat.Id, out var editState))
                 {
-                    cmd = state switch
+                    cmd = editState switch
                     {
-                        StateEdit.Process => factory.CreateComand<CommandEditProcess>(_smEdit)
+                        StateEdit.Process => factory.CreateComand<CommandEditProcess>(_smEdit),
+                        _ => cmd
                     };
                 }
-
-                if (message.Text.StartsWith('/'))
+                else if (_smCreateRole.IsEnable(message.Chat.Id, out var createRoleState))
+                {
+                    cmd = createRoleState switch
+                    {
+                        StateCreateRole.Name => factory.CreateComand<CommandCreateRoleStoreName>(_smCreateRole),
+                        StateCreateRole.Description => factory.CreateComand<CommandCreateRoleStoreDescription>(_smCreateRole),
+                        _ => cmd
+                    };
+                }
+                else if (message.Text.StartsWith('/'))
                 {
                     cmd = message.Text switch
                     {
@@ -70,9 +80,12 @@ namespace KoboldTgBot.TgBot
         {
             var factory = new TgCallbackFactory(_bot, callback);
 
-            TgCallbackBase? clb = callback.Data.Split('=').FirstOrDefault() switch
+            TgCallbackBase? clb = callback.Data!.Split('=').FirstOrDefault() switch
             {
                 "role" => factory.CreateCallback<CallbackRole>(),
+                "accept_role" => factory.CreateCallback<CallbackAcceptRole>(),
+                "create_role" => factory.CreateCallback<CallbackCreateRole>(_smCreateRole),
+                "delete_role" => factory.CreateCallback<CallbackDeleteRole>(),
                 _ => default
             };
 

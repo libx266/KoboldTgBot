@@ -21,7 +21,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 await db.Messages.AddAsync(new DbMessage
                 {
                     Text = _message.Text,
-                    UserId = _message.From.Id,
+                    UserId = _message.From!.Id,
                     ChatId = _message.Chat.Id,
                     TgId = _message.MessageId
                 });
@@ -49,14 +49,13 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await db.Messages.AddAsync(new DbMessage
                 {
-                    Text = sendedMessage.Text,
+                    Text = sendedMessage.Text!,
                     UserId = -1L,
                     ChatId = sendedMessage.Chat.Id,
                     TgId = sendedMessage.MessageId
                 });
 
                 await db.SaveChangesAsync();
-
             }
         }
     }

@@ -16,7 +16,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             var smEdit = _data as StateMachineEdit;
 
-            smEdit.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
+            smEdit!.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
 
             using var db = new DataContext();
 
@@ -30,7 +30,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 {
                     ChatId = _message.Chat.Id,
                     TgId = lastMessage.TgId,
-                    Text = _message.Text,
+                    Text = _message.Text!,
                     UserId = lastMessage.UserId,
                     IsEdited = true
                 });

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.TgBot.Actions.Callbacks
 {
@@ -21,27 +22,20 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
         {
             using var db = new DataContext();
 
-            long chatId = _callback.Message.Chat.Id;
             int roleId = Int32.TryParse(Data, out int r) ? r : 1;
 
-            var currentRole = await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId);
-            if (currentRole is null)
+            var role = await db.Roles.Where(r => r.ID == roleId).Select(r => new { Description = r.Description, System = r.UserId == -1L }).FirstAsync();
+
+            var buttons = new List<InlineKeyboardButton> { new InlineKeyboardButton("Применить") { CallbackData = "accept_role=" + roleId } };
+
+            if (!role.System)
             {
-                await db.CurrentRoles.AddAsync(new DbCurrentRole
-                {
-                    ChatId = chatId,
-                    RoleId = roleId
-                });
-            }
-            else
-            {
-                currentRole.RoleId = roleId;
+                buttons.Add(new InlineKeyboardButton("Удалить") { CallbackData = "delete_role=" + roleId });
             }
 
-            await db.SaveChangesAsync();
+            var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] { buttons.ToArray() });
 
-            await _bot.SendTextMessageAsync(_callback.Message.Chat.Id, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Name).FirstOrDefaultAsync());
-            await _bot.DeleteMessageAsync(_callback.Message.Chat.Id, _callback.Message.MessageId);
+            await _bot.EditMessageTextAsync(_callback.Message!.Chat.Id, _callback.Message.MessageId, role.Description, replyMarkup: keyboard);
         }
     }
 }

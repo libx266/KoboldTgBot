@@ -14,7 +14,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             var smEdit = _data as StateMachineEdit;
 
-            smEdit.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
+            smEdit!.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
 
             var msg = await _bot.SendTextMessageAsync(_message.Chat.Id, Properties.Resources.EditCommand);
 

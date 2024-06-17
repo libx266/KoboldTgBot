@@ -1,11 +1,5 @@
 ﻿using KoboldTgBot.Database;
-using KoboldTgBot.Neuro;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -22,7 +16,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            long userId = _message.From.Id;
+            long userId = _message.From!.Id;
 
             var roles = await
             (
