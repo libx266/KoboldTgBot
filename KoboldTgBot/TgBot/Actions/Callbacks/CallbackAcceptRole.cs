@@ -30,6 +30,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
             else
             {
                 currentRole.RoleId = roleId;
+                currentRole.InsertDate = DateTime.UtcNow;
             }
 
             await db.SaveChangesAsync();
