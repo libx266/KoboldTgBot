@@ -1,19 +1,21 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Objects;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Callbacks
 {
-    internal sealed class CallbackDeleteRole : TgCallbackBase
+    internal sealed class CallbackDeleteRole : TgAction<CallbackHandler>
     {
-        public CallbackDeleteRole(ITelegramBotClient bot, CallbackQuery callback) : base(bot, callback)
+        public const string Name = "delete_role";
+
+        public CallbackDeleteRole(ITelegramBotClient bot, CallbackHandler callback) : base(bot, callback)
         {
         }
 
         protected override async Task WorkAsync()
         {
-            int roleId = Int32.Parse(Data!);
+            int roleId = Int32.Parse(Entity.Data);
 
             using var db = new DataContext();
 
@@ -21,7 +23,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
             db.Roles.Remove(role);
             await db.SaveChangesAsync();
 
-            await _bot.EditMessageTextAsync(_callback.Message!.Chat.Id, _callback.Message.MessageId, "Удалена роль:  " + role.Title);
+            await _bot.EditMessageTextAsync(ChatId, MessageId, "Удалена роль:  " + role.Title);
         }
     }
 }

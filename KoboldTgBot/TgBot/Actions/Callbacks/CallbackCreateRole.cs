@@ -1,25 +1,27 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Callbacks
 {
-    internal sealed class CallbackCreateRole : TgCallbackBase
+    internal sealed class CallbackCreateRole : TgStatedAction<CallbackHandler, StateCreateRole, StateMachineCreateRole>
     {
-        public CallbackCreateRole(ITelegramBotClient bot, CallbackQuery callback) : base(bot, callback)
+        public const string Name = "create_role";
+
+        public CallbackCreateRole(ITelegramBotClient bot, CallbackHandler callback) : base(bot, callback)
         {
         }
 
         protected override async Task WorkAsync()
         {
-            var smCreateRole = _data as StateMachineCreateRole;
-            smCreateRole!.CreateState(StateCreateRole.Title, _callback.Message!.Chat.Id);
-            smCreateRole.Role[_callback.From.Id] = new DbRole();
+            CreateState(StateCreateRole.Title);
 
-            await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Введите название роли");
+            GetSmData(sm => sm.Role)[UserId] = new DbRole();
 
-            smCreateRole.AddMessageToDelete(_callback.Message.Chat.Id, _callback.Message.MessageId);
+            await _bot.EditMessageTextAsync(ChatId, MessageId, "Введите название роли");
+
+            AddMessageToDelete(MessageId);
         }
     }
 }

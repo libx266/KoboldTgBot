@@ -1,51 +1,37 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
-using KoboldTgBot.Utils;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandCreateRoleStoreStyle : TgCommandBase
+    internal sealed class CommandCreateRoleStoreStyle : TgStatedAction<MessageHandler, StateCreateRole, StateMachineCreateRole>
     {
-        public CommandCreateRoleStoreStyle(ITelegramBotClient bot, Message message) : base(bot, message)
+        public CommandCreateRoleStoreStyle(ITelegramBotClient bot, MessageHandler message) : base(bot, message)
         {
         }
 
         protected override async Task WorkAsync()
         {
-            var smCreateRole = _data as StateMachineCreateRole;
+            var role = GetSmData(sm => sm.Role)[UserId];
+            DisableState();
 
-            var role = smCreateRole!.Role[_message.From!.Id];
-            smCreateRole.DisableState(_message.Chat.Id);
-            smCreateRole.Role.Remove(_message.From.Id);
+            GetSmData(sm => sm.Role).Remove(UserId);
 
             using var db = new DataContext();
 
-            role.UserId = _message.From.Id;
-            role.Style = _message.Text!;
+            role.UserId = UserId;
+            role.Style = Text;
             role.InsertDate = DateTime.UtcNow;
 
             await db.Roles.AddAsync(role);
             await db.SaveChangesAsync();
 
-            smCreateRole.AddMessageToDelete(_message.Chat.Id, _message.MessageId);
+            AddMessageToDelete(MessageId);
 
-            foreach (int m in smCreateRole.GetMessagesToDelete(_message.Chat.Id))
-            {
-                try
-                {
-                    await _bot.DeleteMessageAsync(_message.Chat.Id, m);
-                }
-                catch (Exception ex) 
-                {
-                    ex.Log();
-                }
-            }
+            await DeleteMessages();
 
-            smCreateRole.ClearMessagesToDelete(_message.Chat.Id);
-
-            await _bot.SendTextMessageAsync(_message.Chat.Id, "Создана роль:  " + role.Title);
+            await _bot.SendTextMessageAsync(ChatId, "Создана роль:  " + role.Title);
         }
     }
 }

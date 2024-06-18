@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KoboldTgBot.Database
 {
+    #nullable disable
+
     internal sealed class DataContext : DbContext
     {
-        public DbSet<DbMessage> Messages { get; set; } = null!;
-        public DbSet<DbRole> Roles { get; set; } = null!;
-        public DbSet<DbCurrentRole> CurrentRoles { get; set; } = null!;
+        public DbSet<DbMessage> Messages { get; set; }
+        public DbSet<DbRole> Roles { get; set; } 
+        public DbSet<DbCurrentRole> CurrentRoles { get; set; } 
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>

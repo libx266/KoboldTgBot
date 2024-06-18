@@ -1,10 +1,8 @@
-﻿using KoboldTgBot.Database;
-using KoboldTgBot.Neuro;
-using Microsoft.EntityFrameworkCore;
+﻿using KoboldTgBot.TgBot.Actions;
+using KoboldTgBot.TgBot.Objects;
 using Newtonsoft.Json;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using Telegram.Bot.Types;
+using System.Reflection;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.Utils
 {
@@ -30,8 +28,15 @@ namespace KoboldTgBot.Utils
             }
         }
 
-        public static string RemoveEmojis(string text) => 
-            String.Join("", FilterEmojis(text));
+        internal static string RemoveEmojis(string text) => 
+            String.Join(default(string), FilterEmojis(text));
+
+        internal static InlineKeyboardButton MakeInlineButton<T>(string text, object? callbackData = default) where T : TgAction<CallbackHandler>
+        {
+            var name = typeof(T).GetField("Name", BindingFlags.Public | BindingFlags.Static)!.GetValue(default)!.ToString();
+            return new InlineKeyboardButton(text) { CallbackData = name + '=' + callbackData?.ToString() ?? "" };
+        }
+            
             
     }
 }

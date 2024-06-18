@@ -1,20 +1,15 @@
 ﻿using KoboldTgBot.Database;
-using KoboldTgBot.Neuro;
-using KoboldTgBot.Utils;
+using KoboldTgBot.TgBot.Objects;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandRegen : TgCommandBase
+    internal sealed class CommandRegen : CommandWithGenerationBase
     {
-        public CommandRegen(ITelegramBotClient bot, Message message) : base(bot, message)
+        public const string Name = "/regen";
+
+        public CommandRegen(ITelegramBotClient bot, MessageHandler entity) : base(bot, entity)
         {
         }
 
@@ -22,35 +17,20 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            var lastMessage = await db.Messages.Where(m => m.ChatId == _message.Chat.Id && m.InMemory).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
+            var lastMessage = await db.Messages.Where(m => m.ChatId == ChatId && m.InMemory).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
             if (lastMessage is not null && lastMessage.UserId == -1L)
             {
                 lastMessage.InMemory = false;
                 await db.SaveChangesAsync();
 
-                var prompt = await db.ConstructPropmptAsync(_message.Chat.Id, _message.From);
+                string answer = await GenerateAsync(db);
 
-                string answer = "Произошла ошибка, извините пожалуйста!";
-
-                var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt));
-
-                var typing = Task.Run(async () =>
-                {
-                    while (!generation.IsCompleted)
-                    {
-                        await _bot.SendChatActionAsync(_message.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.Typing);
-                        await Task.Delay(TimeSpan.FromSeconds(2));
-                    }
-                });
-
-                await Task.WhenAny(generation, typing);
-
-                await _bot.EditMessageTextAsync(_message.Chat.Id, lastMessage.TgId, answer);
+                await _bot.EditMessageTextAsync(ChatId, lastMessage.TgId, answer);
 
                 await db.Messages.AddAsync(new DbMessage
                 {
-                    ChatId = _message.Chat.Id,
+                    ChatId = ChatId,
                     UserId = -1L,
                     Text = answer,
                     TgId = lastMessage.TgId
@@ -58,7 +38,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await db.SaveChangesAsync();
 
-                await _bot.DeleteMessageAsync(_message.Chat.Id, _message.MessageId);
+                await _bot.DeleteMessageAsync(ChatId, MessageId);
             }
         }
     }

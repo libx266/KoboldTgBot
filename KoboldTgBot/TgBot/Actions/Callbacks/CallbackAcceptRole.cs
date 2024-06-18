@@ -1,13 +1,15 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Objects;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Callbacks
 {
-    internal sealed class CallbackAcceptRole : TgCallbackBase
+    internal sealed class CallbackAcceptRole : TgAction<CallbackHandler>
     {
-        public CallbackAcceptRole(ITelegramBotClient bot, CallbackQuery callback) : base(bot, callback)
+        public const string Name = "accept_role";
+
+        public CallbackAcceptRole(ITelegramBotClient bot, CallbackHandler callback) : base(bot, callback)
         {
         }
 
@@ -15,8 +17,8 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
         {
             using var db = new DataContext();
 
-            long chatId = _callback.Message!.Chat.Id;
-            int roleId = Int32.TryParse(Data, out int r) ? r : 1;
+            long chatId = ChatId;
+            int roleId = Int32.TryParse(Entity.Data, out int r) ? r : 1;
 
             var currentRole = await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId);
             if (currentRole is null)
@@ -33,11 +35,11 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
                 currentRole.InsertDate = DateTime.UtcNow;
             }
 
-            db.Messages.Where(m => m.ChatId == _callback.Message.Chat.Id).ToList().ForEach(m => m.InMemory = false);
+            db.Messages.Where(m => m.ChatId == ChatId).ToList().ForEach(m => m.InMemory = false);
 
             await db.SaveChangesAsync();
 
-            await _bot.EditMessageTextAsync(_callback.Message.Chat.Id, _callback.Message.MessageId, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Title).FirstAsync());
+            await _bot.EditMessageTextAsync(ChatId, MessageId, "Применена роль:  " + await db.Roles.Where(r => r.ID == roleId).Select(r => r.Title).FirstAsync());
         }
     }
 }

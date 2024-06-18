@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using KoboldTgBot.TgBot.Objects;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
     internal sealed class CommandCreateRoleStoreRelation : CommandCreateRoleStoreBase
     {
-        public CommandCreateRoleStoreRelation(ITelegramBotClient bot, Message message) : base(bot, message)
+        public CommandCreateRoleStoreRelation(ITelegramBotClient bot, MessageHandler message) : base(bot, message)
         {
         }
 

@@ -1,15 +1,15 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using KoboldTgBot.TgBot.Objects;
+using Telegram.Bot;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandUnknown : TgCommandBase
+    internal sealed class CommandUnknown : TgAction<MessageHandler>
     {
-        public CommandUnknown(ITelegramBotClient bot, Message message) : base(bot, message)
+        public CommandUnknown(ITelegramBotClient bot, MessageHandler entity) : base(bot, entity)
         {
         }
 
         protected override async Task WorkAsync() =>
-           await _bot.SendTextMessageAsync(_message.Chat.Id, Properties.Resources.UnknownCommandMessage);
+           await _bot.SendTextMessageAsync(ChatId, "Данная команда не зарегистрирована");
     }
 }

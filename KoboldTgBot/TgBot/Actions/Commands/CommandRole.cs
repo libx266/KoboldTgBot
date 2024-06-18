@@ -1,14 +1,18 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Actions.Callbacks;
+using KoboldTgBot.TgBot.Objects;
+using KoboldTgBot.Utils;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandRole : TgCommandBase
+    internal sealed class CommandRole : TgAction<MessageHandler>
     {
-        public CommandRole(ITelegramBotClient bot, Message message) : base(bot, message)
+        public const string Name = "/role";
+
+        public CommandRole(ITelegramBotClient bot, MessageHandler entity) : base(bot, entity)
         {
         }
 
@@ -16,7 +20,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            long userId = _message.From!.Id;
+            long userId = UserId;
 
             var roles = await
             (
@@ -30,11 +34,11 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 }
             ).ToListAsync();
 
-            var buttons = roles.Select(r => new InlineKeyboardButton[] { new InlineKeyboardButton(r.Title) { CallbackData = "role=" + r.ID } });
+            var buttons = roles.Select(r => new InlineKeyboardButton[] { Extensions.MakeInlineButton<CallbackRole>(r.Title, r.ID) });
 
-            var keyboard = new InlineKeyboardMarkup(buttons.Append(new InlineKeyboardButton[] { new InlineKeyboardButton("Добавить") { CallbackData = "create_role=" } }));
+            var keyboard = new InlineKeyboardMarkup(buttons.Append(new InlineKeyboardButton[] { Extensions.MakeInlineButton<CallbackCreateRole>("Добавить") }));
 
-            await _bot.SendTextMessageAsync(_message.Chat.Id, "Выберите роль персонажа:", replyMarkup: keyboard);
+            await _bot.SendTextMessageAsync(ChatId, "Выберите роль персонажа:", replyMarkup: keyboard);
         }
     }
 }

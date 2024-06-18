@@ -61,33 +61,6 @@ namespace KoboldTgBot.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Erika.
-        /// </summary>
-        internal static string BotName {
-            get {
-                return ResourceManager.GetString("BotName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Контекст сброшен.
-        /// </summary>
-        internal static string ClearMessage {
-            get {
-                return ResourceManager.GetString("ClearMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Введите текст сообщения..
-        /// </summary>
-        internal static string EditCommand {
-            get {
-                return ResourceManager.GetString("EditCommand", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на ### Instruction:
         ///Вот твоя анкета:
         ///```
@@ -138,25 +111,17 @@ namespace KoboldTgBot.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Приветствую! Это полнофункциональный чат-бот на базе языковой модели llama3 70B. Чтобы задать вопрос или начать диалог, достаточно просто написать сообщение. Имеются следующие команды:
         ///
-        ////clear - Очищает контекст
-        ////regen - Позволяет перегенерировать ответ
-        ////edit - Позволяет вручную отредактировать ответ модели
-        ////role - Позволяет сменить характер персонажа
+        ////clear - Очистка контекста. Удаляет из памяти модели всю историю вашей переписки.
         ///
-        ///Приятного использования!.
+        ////regen - Повторная генерация. Модель попробует составить свой ответ по-другому.
+        ///
+        ////edit - Редактирование ответа. Позволяет вручную исправить ответ модели для управления контекстом.
+        ///
+        ////mult - Отправка нескольких сообщений. После ввода ком [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string StartMessage {
             get {
                 return ResourceManager.GetString("StartMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Данная команда не зарегистрирована..
-        /// </summary>
-        internal static string UnknownCommandMessage {
-            get {
-                return ResourceManager.GetString("UnknownCommandMessage", resourceCulture);
             }
         }
     }

@@ -1,12 +1,14 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.TgBot.Objects;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandClear : TgCommandBase
+    internal sealed class CommandClear : TgAction<MessageHandler>
     {
-        public CommandClear(ITelegramBotClient bot, Message message) : base(bot, message)
+        public const string Name = "/clear";
+
+        public CommandClear(ITelegramBotClient bot, MessageHandler message) : base(bot, message)
         {
         }
 
@@ -14,11 +16,11 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            db.Messages.Where(m => m.ChatId == _message.Chat.Id).ToList().ForEach(m => m.InMemory = false);
+            db.Messages.Where(m => m.ChatId == ChatId).ToList().ForEach(m => m.InMemory = false);
 
             await db.SaveChangesAsync();
 
-            await _bot.SendTextMessageAsync(_message.Chat.Id, Properties.Resources.ClearMessage);
+            await _bot.SendTextMessageAsync(ChatId, "Контекст сброшен");
         }
     }
 }

@@ -3,11 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KoboldTgBot.Database
 {
+    #nullable disable
+
     [Table("Messages")]
     public sealed class DbMessage : BaseEntity
     {
         [MaxLength(4096)]
-        public string Text { get; set; } = null!;
+        public string Text { get; set; } 
         public long UserId { get; set; }
         public long ChatId { get; set; }
         public int TgId { get; set; }
