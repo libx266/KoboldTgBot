@@ -59,9 +59,7 @@ namespace KoboldTgBot.Neuro
                 dialog.Add(row);
             }
 
-            dialog.Reverse();
-
-           
+            dialog.Reverse(); 
 
             string prompt = String.Format
             (
