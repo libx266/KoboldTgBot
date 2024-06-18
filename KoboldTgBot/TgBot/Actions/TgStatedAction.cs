@@ -19,31 +19,31 @@ namespace KoboldTgBot.TgBot.Actions
 
 
         protected bool StateIsDisable() => 
-            !GetStateMachine().IsEnable(Entity.ChatId, out var _);
+            !GetStateMachine().IsEnable(ChatId, out var _);
 
         protected bool StateIsEnable(out T2 state) =>
-            GetStateMachine().IsEnable(Entity.ChatId, out state);
+            GetStateMachine().IsEnable(ChatId, out state);
 
         protected void CreateState(T2 state) =>
-            GetStateMachine().CreateState(Entity.ChatId, state);
+            GetStateMachine().CreateState(ChatId, state);
 
         protected void DisableState() =>
-            GetStateMachine().DisableState(Entity.ChatId);
+            GetStateMachine().DisableState(ChatId);
 
         protected T GetSmData<T>(Func<T3, T> getter) =>
             getter(GetStateMachine());
 
         
         protected void AddMessageToDelete(int messageId) =>
-            GetStateMachine().MessagesToDelete.AddItem(Entity.ChatId, messageId);
+            GetStateMachine().MessagesToDelete.AddItem(ChatId, messageId);
 
         protected async Task DeleteMessages()
         {
-            foreach (int m in GetStateMachine().MessagesToDelete.GetItems(Entity.ChatId))
+            foreach (int m in GetStateMachine().MessagesToDelete.GetItems(ChatId))
             {
                 try
                 {
-                    await _bot.DeleteMessageAsync(Entity.ChatId, m);
+                    await _bot.DeleteMessageAsync(ChatId, m);
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +51,7 @@ namespace KoboldTgBot.TgBot.Actions
                 }
             }
 
-            GetStateMachine().MessagesToDelete.ClearItems(Entity.ChatId);
+            GetStateMachine().MessagesToDelete.ClearItems(ChatId);
         }
     }
 }
