@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions;
 using KoboldTgBot.Neuro;
 using KoboldTgBot.TgBot.Objects;
 using Telegram.Bot;

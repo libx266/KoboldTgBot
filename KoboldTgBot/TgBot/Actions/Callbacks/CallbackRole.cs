@@ -1,6 +1,6 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions;
 using KoboldTgBot.TgBot.Objects;
-using KoboldTgBot.Utils;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -23,7 +23,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             var role = await db.Roles.FirstAsync(r => r.ID == roleId);
 
-            var buttons = new List<InlineKeyboardButton> { Extensions.MakeInlineButton<CallbackAcceptRole>("Применить", roleId) };
+            var buttons = new List<InlineKeyboardButton> { TgHelper.MakeInlineButton<CallbackAcceptRole>("Применить", roleId) };
 
             var info = String.Format
             (
@@ -38,7 +38,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             if (role.UserId != -1L)
             {
-                buttons.Add(Extensions.MakeInlineButton<CallbackDeleteRole>("Удалить", roleId));
+                buttons.Add(TgHelper.MakeInlineButton<CallbackDeleteRole>("Удалить", roleId));
             }
 
             var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] { buttons.ToArray() });

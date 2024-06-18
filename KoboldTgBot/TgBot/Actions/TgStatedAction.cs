@@ -1,6 +1,6 @@
-﻿using KoboldTgBot.TgBot.Objects;
+﻿using KoboldTgBot.Extensions;
+using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
-using KoboldTgBot.Utils;
 using Telegram.Bot;
 
 namespace KoboldTgBot.TgBot.Actions

@@ -1,9 +1,9 @@
-﻿using KoboldTgBot.TgBot.Actions;
+﻿using KoboldTgBot.Extensions;
+using KoboldTgBot.TgBot.Actions;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
-using KoboldTgBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
