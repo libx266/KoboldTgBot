@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace KoboldTgBot.Extensions
+namespace KoboldTgBot.Extensions.Utils
 {
     internal static class ExceptionHelper
     {

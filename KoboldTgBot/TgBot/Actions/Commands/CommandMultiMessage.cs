@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
 using Telegram.Bot;
@@ -40,13 +41,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
             {
                 using var db = new DataContext();
 
-                await db.Messages.AddAsync(new DbMessage
-                {
-                    Text = Text,
-                    UserId = UserId,
-                    ChatId = ChatId,
-                    TgId = MessageId
-                });
+                await db.AddMessageAsync(Text, UserId, ChatId, MessageId);
 
                 await db.SaveChangesAsync();
             }

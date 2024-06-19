@@ -1,7 +1,7 @@
 ﻿using KoboldTgBot.Database;
-using KoboldTgBot.Extensions;
+using KoboldTgBot.Extensions.Database;
+using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Objects;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -21,7 +21,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             int roleId = Int32.TryParse(Entity.Data, out int r) ? r : 1;
 
-            var role = await db.Roles.FirstAsync(r => r.ID == roleId);
+            var role = await db.GetRoleByIdAsync(roleId);
 
             var buttons = new List<InlineKeyboardButton> { TgHelper.MakeInlineButton<CallbackAcceptRole>("Применить", roleId) };
 

@@ -1,6 +1,6 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.TgBot.Objects;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
 namespace KoboldTgBot.TgBot.Actions.Callbacks
@@ -19,11 +19,10 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             using var db = new DataContext();
 
-            var role = await db.Roles.FirstAsync(r => r.ID == roleId);
-            db.Roles.Remove(role);
+            string title = await db.DeleteRoleByIdAsync(roleId);
             await db.SaveChangesAsync();
 
-            await _bot.EditMessageTextAsync(ChatId, MessageId, "Удалена роль:  " + role.Title);
+            await _bot.EditMessageTextAsync(ChatId, MessageId, "Удалена роль:  " + title);
         }
     }
 }

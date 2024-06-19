@@ -1,4 +1,4 @@
-﻿using KoboldTgBot.Extensions;
+﻿using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;

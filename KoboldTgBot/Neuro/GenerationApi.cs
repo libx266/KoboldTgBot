@@ -1,5 +1,5 @@
 ﻿using KoboldTgBot.Errors;
-using KoboldTgBot.Extensions;
+using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
 using System.Text;

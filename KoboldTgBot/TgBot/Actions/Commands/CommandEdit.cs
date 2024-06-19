@@ -1,7 +1,7 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
@@ -32,26 +32,19 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 using var db = new DataContext();
 
-                var lastMessage = await db.Messages.Where(m => m.ChatId == ChatId && m.InMemory && m.UserId == -1L).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
+                var lastMessage = await db.GetLastBotMessageAsync(ChatId);
 
                 if (lastMessage is not null)
                 {
                     await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, $"🇵🇱 {Text}");
 
-                    await db.Messages.AddAsync(new DbMessage
-                    {
-                        ChatId = ChatId,
-                        TgId = lastMessage.TgId,
-                        Text = Text!,
-                        UserId = lastMessage.UserId,
-                        IsEdited = true
-                    });
-
+                    await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, true);
                     lastMessage.InMemory = false;
 
                     await db.SaveChangesAsync();
 
                     await DeleteMessages();
+
                     DisableState();
                 } 
             }

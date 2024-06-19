@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.TgBot.Objects;
 using Telegram.Bot;
 
@@ -16,8 +17,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            db.Messages.Where(m => m.ChatId == ChatId).ToList().ForEach(m => m.InMemory = false);
-
+            await db.ClearContextAsync(ChatId);
             await db.SaveChangesAsync();
 
             await _bot.SendTextMessageAsync(ChatId, "Контекст сброшен");

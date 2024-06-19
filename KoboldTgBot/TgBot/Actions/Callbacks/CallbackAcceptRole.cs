@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.TgBot.Objects;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
@@ -17,25 +18,10 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
         {
             using var db = new DataContext();
 
-            long chatId = ChatId;
             int roleId = Int32.TryParse(Entity.Data, out int r) ? r : 1;
 
-            var currentRole = await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId);
-            if (currentRole is null)
-            {
-                await db.CurrentRoles.AddAsync(new DbCurrentRole
-                {
-                    ChatId = chatId,
-                    RoleId = roleId
-                });
-            }
-            else
-            {
-                currentRole.RoleId = roleId;
-                currentRole.InsertDate = DateTime.UtcNow;
-            }
-
-            db.Messages.Where(m => m.ChatId == ChatId).ToList().ForEach(m => m.InMemory = false);
+            await db.AcceptRoleAsync(ChatId, roleId);
+            await db.ClearContextAsync(ChatId);
 
             await db.SaveChangesAsync();
 

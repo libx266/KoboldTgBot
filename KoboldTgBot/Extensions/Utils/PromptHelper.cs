@@ -1,21 +1,13 @@
 ﻿using KoboldTgBot.Database;
-using KoboldTgBot.Neuro;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using KoboldTgBot.Extensions.Database;
 using Telegram.Bot.Types;
 
-namespace KoboldTgBot.Extensions
+namespace KoboldTgBot.Extensions.Utils
 {
     internal static class PromptHelper
     {
         internal static async Task<PromptDto> ConstructPropmptAsync(this DataContext db, long chatId, User? user)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory).OrderByDescending(m => m.ID).Take(byte.MaxValue).ToListAsync();
-
             string senderName;
 
             if (string.IsNullOrWhiteSpace(senderName = user!.FirstName ?? "" + ' ' + user.LastName ?? ""))
@@ -23,31 +15,13 @@ namespace KoboldTgBot.Extensions
                 senderName = user.Username ?? "Anonymous";
             }
 
-            var actualFilteredMessages =
-            (
-                from m in messages
-                group m by m.TgId into mg
-                let m2 = mg.MaxBy(m => m.ID)
-                orderby m2.ID descending
-                select new
-                {
-                    Text = m2.Text,
-                    Sender = m2.UserId
-                }
-            );
-
             var dialog = new List<string>();
             int count = 0;
 
-            var role = await
-            (
-                from cr in db.CurrentRoles.Where(cr => cr.ChatId == chatId).DefaultIfEmpty()
-                from r in db.Roles
-                where r.ID == (cr == default ? 1 : cr.RoleId)
-                select r
-            ).FirstAsync();
+            var role = await db.GetCurrentRoleAsync(chatId);
 
-            foreach (var m in actualFilteredMessages)
+
+            foreach (var m in await db.GetMessagesShortFilteredList(chatId))
             {
                 string row = $"{new[] { senderName, role.Name }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
 

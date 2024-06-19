@@ -1,8 +1,8 @@
 ﻿using KoboldTgBot.Database;
-using KoboldTgBot.Extensions;
+using KoboldTgBot.Extensions.Database;
+using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Objects;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -19,20 +19,6 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         protected override async Task WorkAsync()
         {
             using var db = new DataContext();
-
-            long userId = UserId;
-
-            var roles = await
-            (
-                from r in db.Roles
-                where r.UserId == userId ||
-                r.UserId == -1
-                select new
-                {
-                    r.ID,
-                    r.Title
-                }
-            ).ToListAsync();
 
             var buttons = new List<List<InlineKeyboardButton>>();
 
@@ -52,7 +38,8 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 index++;
             };
 
-            roles.ForEach(r => AddButton(TgHelper.MakeInlineButton<CallbackRole>(r.Title, r.ID)));
+            (await db.GetRoleShortListAsync(UserId)).ForEach(r => AddButton(TgHelper.MakeInlineButton<CallbackRole>(r.Title, r.ID)));
+
             AddButton(TgHelper.MakeInlineButton<CallbackCreateRole>("Добавить"));
 
             var keyboard = new InlineKeyboardMarkup(buttons);

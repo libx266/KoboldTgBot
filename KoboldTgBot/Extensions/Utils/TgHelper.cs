@@ -3,7 +3,7 @@ using KoboldTgBot.TgBot.Objects;
 using System.Reflection;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace KoboldTgBot.Extensions
+namespace KoboldTgBot.Extensions.Utils
 {
     internal static class TgHelper
     {

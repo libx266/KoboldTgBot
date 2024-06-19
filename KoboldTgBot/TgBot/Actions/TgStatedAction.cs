@@ -1,4 +1,4 @@
-﻿using KoboldTgBot.Extensions;
+﻿using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
 using Telegram.Bot;
