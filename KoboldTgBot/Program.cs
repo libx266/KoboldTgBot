@@ -4,4 +4,13 @@ using KoboldTgBot.Utils;
 var bot = new TelegramBot(ConfigurationManager.GetTelegramBotToken());
 bot.StartPooling();
 
-while (true) { Console.ReadLine(); }
+while (true)
+{
+    Action? cmd = Console.ReadLine() switch
+    {
+        "clear" => () => Console.Clear(),
+        _ => default
+    };
+
+    cmd?.Invoke();
+}
