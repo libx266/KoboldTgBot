@@ -28,7 +28,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 await _bot.EditMessageTextAsync(ChatId, lastMessage.TgId, answer);
 
-                await db.AddMessageAsync(answer, ChatId, -1L, lastMessage.TgId);
+                await db.AddMessageAsync(answer, -1L, ChatId, lastMessage.TgId);
 
                 await db.SaveChangesAsync();
 
