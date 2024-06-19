@@ -4,6 +4,8 @@ using KoboldTgBot.Utils;
 var bot = new TelegramBot(ConfigurationManager.GetTelegramBotToken());
 bot.StartPooling();
 
+Console.WriteLine("Bot started.");
+
 while (true)
 {
     Action? cmd = Console.ReadLine() switch
