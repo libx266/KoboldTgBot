@@ -19,7 +19,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
             var lastMessage = await db.GetLastBotMessageAsync(ChatId);
 
-            if (lastMessage is not null && lastMessage.UserId == -1L)
+            if (lastMessage is not null)
             {
                 lastMessage.InMemory = false;
                 await db.SaveChangesAsync();
