@@ -30,7 +30,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
                 Properties.Resources.RoleViewInfo,
                 role.Name,
                 role.Gender,
-                role.Charakter,
+                role.Character,
                 role.Specialisation,
                 role.Relation,
                 role.Style

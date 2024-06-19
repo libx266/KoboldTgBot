@@ -34,9 +34,28 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 }
             ).ToListAsync();
 
-            var buttons = roles.Select(r => new InlineKeyboardButton[] { TgHelper.MakeInlineButton<CallbackRole>(r.Title, r.ID) });
+            var buttons = new List<List<InlineKeyboardButton>>();
 
-            var keyboard = new InlineKeyboardMarkup(buttons.Append(new InlineKeyboardButton[] { TgHelper.MakeInlineButton<CallbackCreateRole>("Добавить") }));
+            int index = 0;
+
+            Action<InlineKeyboardButton> AddButton = b =>
+            {
+                if (Convert.ToBoolean(index % 2))
+                {
+                    buttons.Last().Add(b);
+                }
+                else
+                {
+                    buttons.Add(new List<InlineKeyboardButton>() { b });
+                }
+
+                index++;
+            };
+
+            roles.ForEach(r => AddButton(TgHelper.MakeInlineButton<CallbackRole>(r.Title, r.ID)));
+            AddButton(TgHelper.MakeInlineButton<CallbackCreateRole>("Добавить"));
+
+            var keyboard = new InlineKeyboardMarkup(buttons);
 
             await _bot.SendTextMessageAsync(ChatId, "Выберите роль персонажа:", replyMarkup: keyboard);
         }

@@ -10,6 +10,6 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         }
 
         protected override async Task WorkAsync() =>
-            await Store((role, msg) => role.Charakter = msg, "Чем увлекается ваш персонаж? Где он учится/работает?", States.StateCreateRole.Specialisation);
+            await Store((role, msg) => role.Character = msg, "Чем увлекается ваш персонаж? Где он учится/работает?", States.StateCreateRole.Specialisation);
     }
 }

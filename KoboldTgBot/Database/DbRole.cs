@@ -18,7 +18,7 @@ namespace KoboldTgBot.Database
         public string Gender { get; set; }
 
         [MaxLength(1024)]
-        public string Charakter { get; set; }
+        public string Character { get; set; }
         [MaxLength(1024)]
         public string Specialisation { get; set; }
         [MaxLength(1024)]

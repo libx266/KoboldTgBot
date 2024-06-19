@@ -68,7 +68,7 @@ namespace KoboldTgBot.Extensions
                 Properties.Resources.NeuroCharacterPrompt,
                 role.Name,
                 role.Gender,
-                role.Charakter,
+                role.Character,
                 role.Specialisation,
                 role.Relation,
                 role.Style,
