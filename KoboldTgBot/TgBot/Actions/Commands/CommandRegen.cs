@@ -26,13 +26,14 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 string answer = await GenerateAsync(db);
 
-                await _bot.EditMessageTextAsync(ChatId, lastMessage.TgId, answer);
+                var msg = await _bot.SendTextMessageAsync(ChatId, answer);
 
-                await db.AddMessageAsync(answer, -1L, ChatId, lastMessage.TgId);
+                await db.AddMessageAsync(answer, -1L, ChatId, msg.MessageId);
 
                 await db.SaveChangesAsync();
 
                 await _bot.DeleteMessageAsync(ChatId, MessageId);
+                await _bot.DeleteMessageAsync(ChatId, lastMessage.TgId);
             }
         }
     }
