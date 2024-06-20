@@ -61,7 +61,7 @@ namespace KoboldTgBot.Neuro
                     throw ex;
                 }
 
-                return text.TrimEnd('`').TrimEnd('`').TrimEnd('`');
+                return text.TrimEnd('`');
             }
             catch (Exception ex)
             {
