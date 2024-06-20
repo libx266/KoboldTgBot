@@ -10,7 +10,7 @@ namespace KoboldTgBot.Neuro
     {
         internal static async Task<string> GenerateAsync(PromptDto prompt, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
         {
-            string promptText = PromptHelper.RemoveEmojis(prompt.Prompt);
+            string promptText = LLMProcessingHelper.RemoveEmojis(prompt.Prompt);
             try
             {
                 if (!Convert.ToBoolean(attempts))
@@ -47,7 +47,7 @@ namespace KoboldTgBot.Neuro
 
                 string? text = data?.choices[0].text;
 
-                if (string.IsNullOrEmpty(text = PromptHelper.Filter(text, stop)))
+                if (string.IsNullOrEmpty(text = LLMProcessingHelper.Filter(text, stop)))
                 {
                     throw new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
                 }

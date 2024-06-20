@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Extensions.Utils
 {
-    internal static class PromptHelper
+    internal static class LLMProcessingHelper
     {
         internal static async Task<PromptDto> ConstructPropmptAsync(this DataContext db, long chatId, User? user)
         {
