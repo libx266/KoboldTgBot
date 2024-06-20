@@ -107,7 +107,7 @@ namespace KoboldTgBot.Extensions.Utils
                         check(); 
                     }
 
-                    text = text.Remove(text.Length - 4, 3);
+                    text = text.Remove(text.Length - 5, 4);
                     check();
                 }
 
