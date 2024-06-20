@@ -89,7 +89,10 @@ namespace KoboldTgBot.Extensions.Utils
                 stop.ToList().ForEach(s => text = text!.Replace(s, ""));
                 check();
 
-                text = text!.TrimStart('`');
+                if (text!.StartsWith("```"))
+                {
+                    text = text.Remove(0, 3);
+                }
                 check();
 
                 if (Convert.ToBoolean(Regex.Matches(text, @"```").Count % 2))
@@ -101,7 +104,7 @@ namespace KoboldTgBot.Extensions.Utils
                     if(!string.IsNullOrWhiteSpace(last) && segments.Length > 1)
                     {
                         text = text.Replace(last, "");
-                        text = text.TrimEnd('`');
+                        text = text.Remove(text.Length - 4, 3);
                         check();
                     }
                 }
