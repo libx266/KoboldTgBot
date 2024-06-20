@@ -1,5 +1,6 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Extensions.Database;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Extensions.Utils
@@ -70,5 +71,41 @@ namespace KoboldTgBot.Extensions.Utils
 
         internal static string RemoveEmojis(string text) =>
             String.Join(default(string), FilterEmojis(text));
+
+        internal static string? Filter(string? text, string[] stop)
+        {
+            var check = () =>
+            {
+                if (string.IsNullOrEmpty(text) || text.Length < 3)
+                {
+                    throw new Exception("Empty text");
+                }
+            };
+
+            try
+            {
+                check();
+
+                stop.ToList().ForEach(s => text = text!.Replace(s, ""));
+                check();
+
+                text = text!.TrimStart('`');
+                check();
+
+                if (Convert.ToBoolean(Regex.Matches(text, @"```").Count % 2))
+                {
+                    text = text.Replace(text.Split("```").Last(), "");
+                    text = text.TrimEnd('`');
+                    check();
+                }
+
+                return text;
+            }
+            catch
+            {
+                return default;
+            }
+
+        }
     }
 }

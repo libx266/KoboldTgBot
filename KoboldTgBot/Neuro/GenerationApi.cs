@@ -47,21 +47,12 @@ namespace KoboldTgBot.Neuro
 
                 string? text = data?.choices[0].text;
 
-                var ex = new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
-
-                if (string.IsNullOrEmpty(text))
+                if (string.IsNullOrEmpty(text = PromptHelper.Filter(text, stop)))
                 {
-                    throw ex;
+                    throw new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
-                stop.ToList().ForEach(s => text = text.Replace(s, ""));
-
-                if (text.Length < 3)
-                {
-                    throw ex;
-                }
-
-                return text.TrimEnd('`');
+                return text;
             }
             catch (Exception ex)
             {
