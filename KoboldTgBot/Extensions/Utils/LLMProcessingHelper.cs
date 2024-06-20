@@ -94,9 +94,14 @@ namespace KoboldTgBot.Extensions.Utils
 
                 if (Convert.ToBoolean(Regex.Matches(text, @"```").Count % 2))
                 {
-                    text = text.Replace(text.Split("```").Last(), "");
-                    text = text.TrimEnd('`');
-                    check();
+                    string? last = text.Split("```").LastOrDefault();
+
+                    if(!string.IsNullOrWhiteSpace(last))
+                    {
+                        text = text.Replace(last, "");
+                        text = text.TrimEnd('`');
+                        check();
+                    }
                 }
 
                 return text;
