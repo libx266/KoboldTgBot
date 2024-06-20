@@ -94,9 +94,11 @@ namespace KoboldTgBot.Extensions.Utils
 
                 if (Convert.ToBoolean(Regex.Matches(text, @"```").Count % 2))
                 {
-                    string? last = text.Split("```").LastOrDefault();
+                    var segments = text.Split("```");
 
-                    if(!string.IsNullOrWhiteSpace(last))
+                    string? last = segments.LastOrDefault();
+
+                    if(!string.IsNullOrWhiteSpace(last) && segments.Length > 1)
                     {
                         text = text.Replace(last, "");
                         text = text.TrimEnd('`');
