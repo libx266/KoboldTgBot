@@ -104,9 +104,11 @@ namespace KoboldTgBot.Extensions.Utils
                     if(!string.IsNullOrWhiteSpace(last) && segments.Length > 1)
                     {
                         text = text.Replace(last, "");
-                        text = text.Remove(text.Length - 4, 3);
-                        check();
+                        check(); 
                     }
+
+                    text = text.Remove(text.Length - 4, 3);
+                    check();
                 }
 
                 return text;
