@@ -1,0 +1,5 @@
+{
+    "DatabaseConnectionString": "your-npgsql-connection-string",
+    "NeuroApiEndpoint": "http://localhost:5002/api/v1/",
+    "TelegramBotToken": "yout-tg-bot-token"
+}
