@@ -24,7 +24,13 @@ namespace KoboldTgBot.Neuro
 
                 var endpoint = ConfigurationManager.GetNeuroApiEndpoint() + "completions";
 
-                var stop = new[] { "###", "assistant", prompt.BotName + ':', prompt.UserName + ':' };
+                var stop = new[] 
+                { 
+                    "###",
+                    "assistant", 
+                    LLMProcessingHelper.RemoveEmojis(prompt.BotName) + ':', 
+                    LLMProcessingHelper.RemoveEmojis(prompt.UserName) + ':' 
+                };
 
                 var request = new
                 {
