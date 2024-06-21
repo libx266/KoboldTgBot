@@ -72,6 +72,22 @@ namespace KoboldTgBot.Extensions.Utils
         internal static string RemoveEmojis(string text) =>
             String.Join(default(string), FilterEmojis(text));
 
+        private static int GetLastApostrophIndex(string text, out int count)
+        {
+            count = 0;
+            for (int i = text.Length - 1; i >= 0; i--)
+            {
+                char c = text[i];
+                if (c == '`')
+                {
+                    count += 3;
+                    return i - 2;
+                }
+                count++;
+            }
+            return -1;
+        }
+
         internal static string? Filter(string? text, string[] stop)
         {
             var check = () =>
@@ -97,17 +113,7 @@ namespace KoboldTgBot.Extensions.Utils
 
                 if (Convert.ToBoolean(Regex.Matches(text, @"```").Count % 2))
                 {
-                    var segments = text.Split("```");
-
-                    string? last = segments.LastOrDefault();
-
-                    if(!string.IsNullOrWhiteSpace(last) && segments.Length > 1)
-                    {
-                        text = text.Replace(last, "");
-                        check(); 
-                    }
-
-                    text = text.Remove(text.Length - 5, 4);
+                    text = text.Remove(GetLastApostrophIndex(text, out int count), count);
                     check();
                 }
 
