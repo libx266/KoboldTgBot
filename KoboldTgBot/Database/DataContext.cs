@@ -11,6 +11,8 @@ namespace KoboldTgBot.Database
         public DbSet<DbRole> Roles { get; set; } 
         public DbSet<DbCurrentRole> CurrentRoles { get; set; } 
 
+        public DataContext() => Database.EnsureCreated();
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
             optionsBuilder.UseNpgsql(ConfigurationManager.GetDatabaseConnectionString());
