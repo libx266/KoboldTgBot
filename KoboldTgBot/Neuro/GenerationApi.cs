@@ -65,6 +65,7 @@ namespace KoboldTgBot.Neuro
 
             var request = new HttpRequestMessage();
 
+            request.RequestUri = new Uri(ProxiAPIEndpoint);
             request.Method = HttpMethod.Post;
             request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
