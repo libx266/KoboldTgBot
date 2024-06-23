@@ -26,7 +26,7 @@ namespace KoboldTgBot.TgBot.Actions
             var result = (T2)constructor!.Invoke(new object[] { _bot, _entity });
 
             SetValue(result, "_data", data);
-            SetValue(result, "_gpt_4o", _gpt4o);
+            SetValue(result, "_gpt4o", _gpt4o);
 
             return result;
         }
