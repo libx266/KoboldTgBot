@@ -56,6 +56,15 @@ namespace KoboldTgBot.TgBot
             }
         }
 
+        private bool IsGpt4oCommand(string? text)
+        {
+            bool gpt4Exist = !string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret);
+            bool validInput = !string.IsNullOrEmpty(text);
+            bool validCmd = text!.StartsWith('/' + ConfigurationManager.Gpt4oSecret);
+
+            return gpt4Exist && validInput && validCmd;
+        }
+
         private async Task HandleCommandAsync(Message message)
         {
             if (!string.IsNullOrEmpty(message.Text))
@@ -86,27 +95,24 @@ namespace KoboldTgBot.TgBot
                 {
                     cmd = factory.Create<CommandMultiMessage>(_smMultiMessage);
                 }
+                else if (IsGpt4oCommand(message.Text))
+                {
+                    Action<bool> setter = gpt4o => _gpt4o[message.Chat.Id] = gpt4o;
+                    cmd = factory.Create<CommandGpt4o>(setter);
+                }
                 else if (message.Text.StartsWith('/'))
                 {
-                    if (message.Text.Contains(ConfigurationManager.Gpt4oSecret))
+                    cmd = message.Text switch
                     {
-                        Action<bool> setter = gpt4o => _gpt4o[message.Chat.Id] = gpt4o;
-                        cmd = factory.Create<CommandGpt4o>(setter);
-                    }
-                    else
-                    {
-                        cmd = message.Text switch
-                        {
-                            CommandStart.Name => factory.Create<CommandStart>(),
-                            CommandClear.Name => factory.Create<CommandClear>(),
-                            CommandRole.Name => factory.Create<CommandRole>(),
-                            CommandRegen.Name => factory.Create<CommandRegen>(),
-                            CommandEdit.Name => factory.Create<CommandEdit>(_smEdit),
-                            CommandMultiMessage.Name => factory.Create<CommandMultiMessage>(_smMultiMessage),
-                            CommandMore.Name => factory.Create<CommandMore>(),
-                            _ => factory.Create<CommandUnknown>()
-                        };
-                    }
+                        CommandStart.Name => factory.Create<CommandStart>(),
+                        CommandClear.Name => factory.Create<CommandClear>(),
+                        CommandRole.Name => factory.Create<CommandRole>(),
+                        CommandRegen.Name => factory.Create<CommandRegen>(),
+                        CommandEdit.Name => factory.Create<CommandEdit>(_smEdit),
+                        CommandMultiMessage.Name => factory.Create<CommandMultiMessage>(_smMultiMessage),
+                        CommandMore.Name => factory.Create<CommandMore>(),
+                        _ => factory.Create<CommandUnknown>()
+                    };
                 }
 
                 await ExecuteAction(cmd);
@@ -129,8 +135,6 @@ namespace KoboldTgBot.TgBot
             await ExecuteAction(clb);
         }
 
-        
-
         private void HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)
         {
             var task = async () =>
@@ -145,18 +149,9 @@ namespace KoboldTgBot.TgBot
                 }
             };
 
-            if 
-            (
-                GetGpt4o(update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id) || 
-                (
-                    !(
-                        string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret) ||
-                        string.IsNullOrEmpty(update.Message?.Text)
-                    ) &&
-                    update.Message.Text.StartsWith('/') &&
-                    update.Message.Text.Contains(ConfigurationManager.Gpt4oSecret)
-                )
-            )
+            long chatId = update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id;
+
+            if (GetGpt4o(chatId) || IsGpt4oCommand(update.Message?.Text))
             {
                 Task.Run(task);
             }
