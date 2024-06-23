@@ -14,14 +14,22 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
         protected override async Task WorkAsync()
         {
-            var keyboard = new ReplyKeyboardMarkup(new KeyboardButton[]
+            var keyboard = new ReplyKeyboardMarkup(new KeyboardButton[][]
             {
-                new KeyboardButton(CommandClear.Name),
-                new KeyboardButton(CommandRegen.Name),
-                new KeyboardButton(CommandEdit.Name),
-                new KeyboardButton(CommandMultiMessage.Name),
-                new KeyboardButton(CommandMore.Name),
-                new KeyboardButton(CommandRole.Name)
+                new []
+                {
+                    new KeyboardButton(CommandClear.Name),
+                    new KeyboardButton(CommandRegen.Name),
+                    new KeyboardButton(CommandEdit.Name),
+                },
+                new []
+                {
+                    new KeyboardButton(CommandMultiMessage.Name),
+                    new KeyboardButton(CommandMore.Name),
+                    new KeyboardButton(CommandRole.Name)
+                }
+
+                
             });
 
             keyboard.ResizeKeyboard = true;
