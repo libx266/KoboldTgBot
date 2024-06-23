@@ -17,8 +17,8 @@ namespace KoboldTgBot.TgBot.Actions
             _gpt4o = gpt4o;
         }
 
-        private static void SetValue<T>(T instance, string name, object? value) =>
-            typeof(T).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(instance, value);
+        private static void SetValue<T2>(T2 instance, string name, object? value) =>
+            typeof(T2).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(instance, value);
 
         internal T2 Create<T2>(object? data = default) where T2 : TgAction<T>
         {
