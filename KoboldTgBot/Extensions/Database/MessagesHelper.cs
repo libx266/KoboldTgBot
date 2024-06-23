@@ -13,7 +13,7 @@ namespace KoboldTgBot.Extensions.Database
         /// <returns></returns>
         internal static async Task ClearContextAsync(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.RoleId == roleId).ToListAsync();
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.RoleId == roleId && m.InMemory).ToListAsync();
             messages.ForEach(m => m.InMemory = false);
         }
 
