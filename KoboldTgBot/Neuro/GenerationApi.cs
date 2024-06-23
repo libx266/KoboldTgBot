@@ -58,7 +58,8 @@ namespace KoboldTgBot.Neuro
                     }
                 },
                 temperature = temperature,
-                max_tokens = maxLength
+                max_tokens = maxLength,
+                stop = stop
             };
 
             var request = new HttpRequestMessage();
