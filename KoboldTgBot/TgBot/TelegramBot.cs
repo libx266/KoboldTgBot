@@ -58,11 +58,11 @@ namespace KoboldTgBot.TgBot
 
         private bool IsGpt4oCommand(string? text)
         {
-            bool gpt4Exist = !string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret);
-            bool validInput = !string.IsNullOrEmpty(text);
-            bool validCmd = text!.StartsWith('/' + ConfigurationManager.Gpt4oSecret);
+            var gpt4Exist = () =>  !string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret);
+            var  validInput = () => !string.IsNullOrEmpty(text);
+            var validCmd = () => text!.StartsWith('/' + ConfigurationManager.Gpt4oSecret);
 
-            return gpt4Exist && validInput && validCmd;
+            return gpt4Exist() && validInput() && validCmd();
         }
 
         private async Task HandleCommandAsync(Message message)
