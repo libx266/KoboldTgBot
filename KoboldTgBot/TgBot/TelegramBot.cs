@@ -75,7 +75,8 @@ namespace KoboldTgBot.TgBot
                 {
                     if (message.Text.Contains(ConfigurationManager.Gpt4oSecret))
                     {
-                        cmd = factory.Create<CommandGpt4o>((bool gpt4o) => _gpt4o[message.Chat.Id] = gpt4o);
+                        Action<bool> setter = (bool gpt4o) => _gpt4o[message.Chat.Id] = gpt4o;
+                        cmd = factory.Create<CommandGpt4o>(setter);
                     }
                     else
                     {
