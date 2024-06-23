@@ -2,10 +2,7 @@
 using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
-using System.Net;
 using System.Text;
-using Telegram.Bot.Requests.Abstractions;
-using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Neuro
 {
