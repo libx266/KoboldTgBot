@@ -57,7 +57,8 @@ namespace KoboldTgBot.Neuro
                         content = promptText
                     }
                 },
-                temperature = temperature
+                temperature = temperature,
+                max_tokens = maxLength
             };
 
             var request = new HttpRequestMessage();
