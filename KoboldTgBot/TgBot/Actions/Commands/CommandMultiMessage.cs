@@ -41,7 +41,9 @@ namespace KoboldTgBot.TgBot.Actions.Commands
             {
                 using var db = new DataContext();
 
-                await db.AddMessageAsync(Text, UserId, ChatId, MessageId);
+                var role = await db.GetCurrentRoleAsync(ChatId);
+
+                await db.AddMessageAsync(Text, UserId, ChatId, MessageId, role.ID);
 
                 await db.SaveChangesAsync();
             }

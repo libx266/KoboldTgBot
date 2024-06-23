@@ -21,7 +21,6 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
             int roleId = Int32.TryParse(Entity.Data, out int r) ? r : 1;
 
             await db.AcceptRoleAsync(ChatId, roleId);
-            await db.ClearContextAsync(ChatId);
 
             await db.SaveChangesAsync();
 

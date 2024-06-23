@@ -17,7 +17,9 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            var lastMessage = await db.GetLastBotMessageAsync(ChatId);
+            var role = await db.GetCurrentRoleAsync(ChatId);
+
+            var lastMessage = await db.GetLastBotMessageAsync(ChatId, role.ID);
 
             if (lastMessage is not null)
             {
@@ -28,7 +30,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 var msg = await _bot.SendTextMessageAsync(ChatId, answer);
 
-                await db.AddMessageAsync(answer, -1L, ChatId, msg.MessageId);
+                await db.AddMessageAsync(answer, -1L, ChatId, msg.MessageId, role.ID);
 
                 await db.SaveChangesAsync();
 

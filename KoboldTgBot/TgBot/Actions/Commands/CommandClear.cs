@@ -17,7 +17,9 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            await db.ClearContextAsync(ChatId);
+            var role = await db.GetCurrentRoleAsync(ChatId);
+
+            await db.ClearContextAsync(ChatId, role.ID);
             await db.SaveChangesAsync();
 
             await _bot.SendTextMessageAsync(ChatId, "Контекст сброшен");

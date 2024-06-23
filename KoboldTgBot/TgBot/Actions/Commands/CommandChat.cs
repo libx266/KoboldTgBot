@@ -17,15 +17,17 @@ namespace KoboldTgBot.TgBot.Actions.Commands
             {
                 using var db = new DataContext();
 
+                var role = await db.GetCurrentRoleAsync(ChatId);
+
                 if (_data == default)
                 {
-                    await db.AddMessageAsync(Text, UserId, ChatId, MessageId);
+                    await db.AddMessageAsync(Text, UserId, ChatId, MessageId, role.ID);
                     await db.SaveChangesAsync();
                 }
 
                 var sendedMessage = await _bot.SendTextMessageAsync(ChatId, await GenerateAsync(db));
 
-                await db.AddMessageAsync(sendedMessage.Text!, -1L, sendedMessage.Chat.Id, sendedMessage.MessageId);
+                await db.AddMessageAsync(sendedMessage.Text!, -1L, sendedMessage.Chat.Id, sendedMessage.MessageId, role.ID);
                 await db.SaveChangesAsync();
             }
         }

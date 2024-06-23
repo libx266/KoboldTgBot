@@ -32,13 +32,15 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 using var db = new DataContext();
 
-                var lastMessage = await db.GetLastBotMessageAsync(ChatId);
+                var role = await db.GetCurrentRoleAsync(ChatId);
+
+                var lastMessage = await db.GetLastBotMessageAsync(ChatId, role.ID);
 
                 if (lastMessage is not null)
                 {
                     await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, $"🇵🇱 {Text}");
 
-                    await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, true);
+                    await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, role.ID, true);
                     lastMessage.InMemory = false;
 
                     await db.SaveChangesAsync();

@@ -11,9 +11,9 @@ namespace KoboldTgBot.Extensions.Database
         /// <param name="db"></param>
         /// <param name="chatId"></param>
         /// <returns></returns>
-        internal static async Task ClearContextAsync(this DataContext db, long chatId)
+        internal static async Task ClearContextAsync(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId).ToListAsync();
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.RoleId == roleId).ToListAsync();
             messages.ForEach(m => m.InMemory = false);
         }
 
@@ -26,21 +26,22 @@ namespace KoboldTgBot.Extensions.Database
         /// <param name="chatId"></param>
         /// <param name="messageId"></param>
         /// <returns></returns>
-        internal static async Task AddMessageAsync(this DataContext db, string text, long userId, long chatId, int messageId, bool isEdited = false) => await db.Messages.AddAsync(new DbMessage
+        internal static async Task AddMessageAsync(this DataContext db, string text, long userId, long chatId, int messageId, int roleId, bool isEdited = false) => await db.Messages.AddAsync(new DbMessage
         {
             Text = text,
             UserId = userId,
             ChatId = chatId,
             TgId = messageId,
+            RoleId = roleId,
             IsEdited = isEdited
         });
 
-        internal static async Task<DbMessage?> GetLastBotMessageAsync(this DataContext db, long chatId) =>
-            await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.UserId == -1L).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
+        internal static async Task<DbMessage?> GetLastBotMessageAsync(this DataContext db, long chatId, int roleId) =>
+            await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.UserId == -1L && m.RoleId == roleId).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
-        internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredList(this DataContext db, long chatId)
+        internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredList(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory).OrderByDescending(m => m.ID).Take(byte.MaxValue).ToListAsync();
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(byte.MaxValue).ToListAsync();
 
             return
             (

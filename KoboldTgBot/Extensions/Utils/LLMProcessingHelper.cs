@@ -22,7 +22,7 @@ namespace KoboldTgBot.Extensions.Utils
             var role = await db.GetCurrentRoleAsync(chatId);
 
 
-            foreach (var m in await db.GetMessagesShortFilteredList(chatId))
+            foreach (var m in await db.GetMessagesShortFilteredList(chatId, role.ID))
             {
                 string row = $"{new[] { senderName, role.Name }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
 

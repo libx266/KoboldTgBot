@@ -12,6 +12,7 @@ namespace KoboldTgBot.Database
         public string Text { get; set; } 
         public long UserId { get; set; }
         public long ChatId { get; set; }
+        public int RoleId { get; set; } = 1;
         public int TgId { get; set; }
         public bool IsEdited { get; set; } = false;
         public bool InMemory { get; set; } = true;
