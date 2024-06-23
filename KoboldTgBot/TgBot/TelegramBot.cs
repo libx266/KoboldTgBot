@@ -145,7 +145,18 @@ namespace KoboldTgBot.TgBot
                 }
             };
 
-            if (GetGpt4o(update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id))
+            if 
+            (
+                GetGpt4o(update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id) || 
+                (
+                    !(
+                        string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret) ||
+                        string.IsNullOrEmpty(update.Message?.Text)
+                    ) &&
+                    update.Message.Text.StartsWith('/') &&
+                    update.Message.Text.Contains(ConfigurationManager.Gpt4oSecret)
+                )
+            )
             {
                 Task.Run(task);
             }
