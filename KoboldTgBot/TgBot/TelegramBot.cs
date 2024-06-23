@@ -20,13 +20,28 @@ namespace KoboldTgBot.TgBot
         private readonly StateMachineMultiMessage _smMultiMessage = new();
 
         private readonly Dictionary<long, bool> _gpt4o = new();
+        private readonly Queue<Func<Task>> _llama3 = new();
 
         private bool GetGpt4o(long chatId) => _gpt4o.TryGetValue(chatId, out var value) ? value : false;
 
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
 
-        internal void StartPooling() => _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
+        internal async void StartPooling()
+        {
+            _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
+            while (true)
+            {
+                if (_llama3.TryDequeue(out var task))
+                {
+                    await task();
+                }
+                else
+                {
+                    await Task.Delay(100);
+                }
+            }
+        }
 
         private async Task ExecuteAction<T>(TgAction<T>? action) where T : ActionEntity
         {
@@ -114,15 +129,29 @@ namespace KoboldTgBot.TgBot
             await ExecuteAction(clb);
         }
 
-        private async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)
+        
+
+        private void HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)
         {
-            if (update.Message is not null)
+            var task = async () =>
             {
-                await HandleCommandAsync(update.Message);
+                if (update.Message is not null)
+                {
+                    await HandleCommandAsync(update.Message);
+                }
+                if (update.CallbackQuery is not null)
+                {
+                    await HandleCallbackAsync(update.CallbackQuery);
+                }
+            };
+
+            if (GetGpt4o(update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id))
+            {
+                Task.Run(task);
             }
-            if (update.CallbackQuery is not null)
+            else
             {
-                await HandleCallbackAsync(update.CallbackQuery);
+                _llama3.Enqueue(task);
             }
         }
     }
