@@ -15,7 +15,7 @@ namespace KoboldTgBot.Database
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-            optionsBuilder.UseNpgsql(ConfigurationManager.GetDatabaseConnectionString());
+            optionsBuilder.UseNpgsql(ConfigurationManager.DatabaseConnectionString);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<DbRole>().HasData
         (

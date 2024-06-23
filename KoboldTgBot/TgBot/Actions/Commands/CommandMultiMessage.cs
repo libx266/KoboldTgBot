@@ -29,7 +29,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
             {
                 AddMessageToDelete(MessageId);
 
-                var factory = new TgCommandFactory(_bot, Entity.Get(m => m));
+                var factory = new TgCommandFactory(_bot, Entity.Get(m => m), _gpt4o);
                 var chat = factory.Create<CommandChat>(new object());
                 await chat.ExecuteAsync();
 

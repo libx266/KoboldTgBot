@@ -8,8 +8,10 @@ namespace KoboldTgBot.TgBot.Actions
         protected object? _data = default;
 
         protected readonly ITelegramBotClient _bot;
-
         protected readonly T Entity;
+
+        private bool _gpt_4o;
+        protected bool _gpt4o => _gpt_4o;
 
         protected long ChatId => Entity.ChatId;
         protected long UserId => Entity.UserId;

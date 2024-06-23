@@ -1,7 +1,7 @@
 ﻿using KoboldTgBot.TgBot;
 using KoboldTgBot.Utils;
 
-var bot = new TelegramBot(ConfigurationManager.GetTelegramBotToken());
+var bot = new TelegramBot(ConfigurationManager.TelegramBotToken);
 bot.StartPooling();
 
 Console.WriteLine("Bot started.");

@@ -13,7 +13,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
         protected override async Task WorkAsync()
         {
-            var factory = new TgCommandFactory(_bot, Entity.Get(m => m));
+            var factory = new TgCommandFactory(_bot, Entity.Get(m => m), _gpt4o);
             var chat = factory.Create<CommandChat>(new object());
             await chat.ExecuteAsync();
 
