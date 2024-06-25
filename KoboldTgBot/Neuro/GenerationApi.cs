@@ -1,4 +1,5 @@
-﻿using KoboldTgBot.Errors;
+﻿using KoboldTgBot.Database;
+using KoboldTgBot.Errors;
 using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
@@ -40,7 +41,7 @@ namespace KoboldTgBot.Neuro
 
         private const string ProxiAPIEndpoint = "https://api.proxyapi.ru/openai/v1/chat/completions";
 
-        private static async Task<string?> SendRequestGpt4o(string promptText, string[] stop, ushort maxLength, float temperature)
+        private static async Task<string?> SendRequestGpt4o(string promptText, long userId, string[] stop, ushort maxLength, float temperature)
         {
             using var http = new HttpClient();
 
@@ -76,10 +77,27 @@ namespace KoboldTgBot.Neuro
 
             var answer = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
 
-            return answer?.choices[0].message.content;
+            string? text = answer?.choices[0].message.content;
+
+            using var db = new DataContext();
+
+            await db.Generations.AddAsync(new DbGeneration
+            {
+                Answer = text ?? string.Empty,
+                Prompt = promptText,
+                PromptTokens = answer!.usage.prompt_tokens,
+                CompletionTokens = answer!.usage.total_tokens,
+                GenerationId = answer!.id,
+                Model = "gpt-4o",
+                UserId = userId
+            });
+
+            await db.SaveChangesAsync();
+
+            return text;
         }
 
-        internal static async Task<string> GenerateAsync(PromptDto prompt, bool gpt4o, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
+        internal static async Task<string> GenerateAsync(PromptDto prompt, bool gpt4o, long userId, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
         {
             string promptText = LLMProcessingHelper.RemoveEmojis(prompt.Prompt);
             try
@@ -100,7 +118,7 @@ namespace KoboldTgBot.Neuro
                 string? text = await new[]
                 {
                     () => SendRequestLocal(promptText, stop, maxLength, temperature, topPSampling, repetitionPenalty),
-                    () => SendRequestGpt4o(promptText, stop, maxLength, temperature)
+                    () => SendRequestGpt4o(promptText, userId, stop, maxLength, temperature)
                 }
                 [Convert.ToInt32(gpt4o)]();
 
@@ -114,7 +132,7 @@ namespace KoboldTgBot.Neuro
             catch (Exception ex)
             {
                 ex.Log();
-                return await GenerateAsync(prompt, gpt4o, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
+                return await GenerateAsync(prompt, gpt4o, userId, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
             }
         }
     }

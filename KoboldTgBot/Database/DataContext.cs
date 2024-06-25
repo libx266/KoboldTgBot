@@ -10,6 +10,7 @@ namespace KoboldTgBot.Database
         public DbSet<DbMessage> Messages { get; set; }
         public DbSet<DbRole> Roles { get; set; } 
         public DbSet<DbCurrentRole> CurrentRoles { get; set; } 
+        public DbSet<DbGeneration> Generations { get; set; }
 
         public DataContext() => Database.EnsureCreated();
 
