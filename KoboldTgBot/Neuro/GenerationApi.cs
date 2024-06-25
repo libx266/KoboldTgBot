@@ -86,7 +86,7 @@ namespace KoboldTgBot.Neuro
                 Answer = text ?? string.Empty,
                 Prompt = promptText,
                 PromptTokens = answer!.usage.prompt_tokens,
-                CompletionTokens = answer!.usage.total_tokens,
+                CompletionTokens = answer!.usage.completion_tokens,
                 GenerationId = answer!.id,
                 Model = "gpt-4o",
                 UserId = userId
