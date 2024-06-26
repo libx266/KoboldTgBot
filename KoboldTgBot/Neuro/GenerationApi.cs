@@ -1,6 +1,7 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Errors;
 using KoboldTgBot.Extensions.Utils;
+using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
 using System.Text;
@@ -99,7 +100,7 @@ namespace KoboldTgBot.Neuro
             
             await db.SaveChangesAsync();
 
-            return cab.Balance > 0 ? text : "Ваш баланс отрицательный";
+            return cab.Balance > 0 ? text : "Ваш баланс отрицательный, модель переключена на " + CommandBalance.LLama3;
         }
 
         internal static async Task<string> GenerateAsync(PromptDto prompt, long userId, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
