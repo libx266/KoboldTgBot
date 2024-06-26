@@ -6,7 +6,7 @@ namespace KoboldTgBot.TgBot.Actions
 {
     internal sealed class TgCallbackFactory : TgActionFactory<CallbackHandler>
     {
-        public TgCallbackFactory(ITelegramBotClient bot, CallbackQuery callback, bool gpt4o) : base(bot, new CallbackHandler(callback), gpt4o)
+        public TgCallbackFactory(ITelegramBotClient bot, CallbackQuery callback) : base(bot, new CallbackHandler(callback))
         {
         }
     }

@@ -18,7 +18,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
             string answer = "._.";
 
-            var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt, _gpt4o, UserId));
+            var generation = Task.Run(async () => answer = await GenerationApi.GenerateAsync(prompt, UserId));
 
             var typing = Task.Run(async () =>
             {

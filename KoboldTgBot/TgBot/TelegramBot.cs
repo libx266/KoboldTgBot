@@ -1,4 +1,5 @@
-﻿using KoboldTgBot.Extensions.Utils;
+﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;
@@ -22,14 +23,14 @@ namespace KoboldTgBot.TgBot
         private readonly Dictionary<long, bool> _gpt4o = new();
         private readonly Queue<Func<Task>> _llama3 = new();
 
-        private bool GetGpt4o(long chatId) => _gpt4o.TryGetValue(chatId, out var value) ? value : false;
-
         internal TelegramBot(string token) =>
             _bot = new TelegramBotClient(_token = token);
 
         internal async void StartPooling()
         {
             _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
+            _gpt4o.Add(7098926305L, true);
+
             while (true)
             {
                 if (_llama3.TryDequeue(out var task))
@@ -69,7 +70,7 @@ namespace KoboldTgBot.TgBot
         {
             if (!string.IsNullOrEmpty(message.Text))
             {
-                var factory = new TgCommandFactory(_bot, message, GetGpt4o(message.Chat.Id));
+                var factory = new TgCommandFactory(_bot, message);
                
                 TgAction<MessageHandler> cmd = factory.Create<CommandChat>();
 
@@ -97,8 +98,6 @@ namespace KoboldTgBot.TgBot
                 }
                 else if (IsGpt4oCommand(message.Text))
                 {
-                    Action<bool> setter = gpt4o => _gpt4o[message.Chat.Id] = gpt4o;
-                    cmd = factory.Create<CommandGpt4o>(setter);
                 }
                 else if (message.Text.StartsWith('/'))
                 {
@@ -111,6 +110,7 @@ namespace KoboldTgBot.TgBot
                         CommandEdit.Name => factory.Create<CommandEdit>(_smEdit),
                         CommandMultiMessage.Name => factory.Create<CommandMultiMessage>(_smMultiMessage),
                         CommandMore.Name => factory.Create<CommandMore>(),
+                        CommandBalance.Name => factory.Create<CommandBalance>(),
                         _ => factory.Create<CommandUnknown>()
                     };
                 }
@@ -121,7 +121,7 @@ namespace KoboldTgBot.TgBot
 
         private async Task HandleCallbackAsync(CallbackQuery callback)
         {
-            var factory = new TgCallbackFactory(_bot, callback, GetGpt4o(callback.Message!.Chat.Id));
+            var factory = new TgCallbackFactory(_bot, callback);
 
             TgAction<CallbackHandler>? clb = callback.Data!.Split('=').FirstOrDefault() switch
             {
@@ -129,6 +129,7 @@ namespace KoboldTgBot.TgBot
                 CallbackAcceptRole.Name => factory.Create<CallbackAcceptRole>(),
                 CallbackCreateRole.Name => factory.Create<CallbackCreateRole>(_smCreateRole),
                 CallbackDeleteRole.Name => factory.Create<CallbackDeleteRole>(),
+                CallbackSelectModel.Name => factory.Create<CallbackSelectModel>(),
                 _ => default
             };
 
@@ -149,9 +150,18 @@ namespace KoboldTgBot.TgBot
                 }
             };
 
-            long chatId = update.Message?.Chat?.Id ?? update.CallbackQuery!.Message!.Chat.Id;
+            long userId = update.Message?.From?.Id ?? update.CallbackQuery!.From.Id;
 
-            if (GetGpt4o(chatId) || IsGpt4oCommand(update.Message?.Text))
+            using var db = new DataContext();
+
+            var cab = db.Cabinets.FirstOrDefault(c => c.UserId == userId);
+
+            if
+            (
+                ((cab?.IsGpt4o ?? false) && (cab?.Balance ?? 0) > 0) || 
+                update.Message?.Text == CommandBalance.Name ||
+                update?.CallbackQuery?.Data?.Split('=').FirstOrDefault() == CallbackSelectModel.Name
+            )
             {
                 Task.Run(task);
             }

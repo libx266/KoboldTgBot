@@ -8,13 +8,11 @@ namespace KoboldTgBot.TgBot.Actions
     {
         private readonly ITelegramBotClient _bot;
         private readonly T _entity;
-        private readonly bool _gpt4o;
 
-        internal TgActionFactory(ITelegramBotClient bot, T entity, bool gpt4o)
+        internal TgActionFactory(ITelegramBotClient bot, T entity)
         {
             _bot = bot;
             _entity = entity;
-            _gpt4o = gpt4o;
         }
 
         private static void SetValue<T2>(T2 instance, string name, object? value) =>
@@ -26,7 +24,6 @@ namespace KoboldTgBot.TgBot.Actions
             var result = (T2)constructor!.Invoke(new object[] { _bot, _entity });
 
             SetValue(result, "_data", data);
-            SetValue(result, "_gpt4o", _gpt4o);
 
             return result;
         }

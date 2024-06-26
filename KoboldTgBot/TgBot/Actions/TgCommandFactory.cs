@@ -6,7 +6,7 @@ namespace KoboldTgBot.TgBot.Actions
 {
     internal sealed class TgCommandFactory : TgActionFactory<MessageHandler>
     {
-        public TgCommandFactory(ITelegramBotClient bot, Message message, bool gpt4o) : base(bot, new MessageHandler(message), gpt4o)
+        public TgCommandFactory(ITelegramBotClient bot, Message message) : base(bot, new MessageHandler(message))
         {
         }
     }

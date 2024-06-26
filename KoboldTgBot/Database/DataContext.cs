@@ -11,6 +11,7 @@ namespace KoboldTgBot.Database
         public DbSet<DbRole> Roles { get; set; } 
         public DbSet<DbCurrentRole> CurrentRoles { get; set; } 
         public DbSet<DbGeneration> Generations { get; set; }
+        public DbSet<DbCabinet> Cabinets { get; set; }
 
         public DataContext() => Database.EnsureCreated();
 
