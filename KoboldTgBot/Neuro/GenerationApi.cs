@@ -97,7 +97,12 @@ namespace KoboldTgBot.Neuro
 
             var cab = db.Cabinets.First(c => c.UserId == userId);
             cab.Balance -= (((decimal)gen.PromptTokens / 1000) * cab.PromptTokenPrice + ((decimal)gen.CompletionTokens / 1000) * cab.CompletionTokenPrice);
-            
+
+            if (cab.Balance < 0)
+            {
+                cab.IsGpt4o = false;
+            }
+
             await db.SaveChangesAsync();
 
             return cab.Balance > 0 ? text : "Ваш баланс отрицательный, модель переключена на " + CommandBalance.LLama3;
