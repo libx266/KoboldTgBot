@@ -30,7 +30,7 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             await db.SaveChangesAsync();
 
-            await _bot.SendTextMessageAsync(ChatId, "Переключено на" + Entity.Data);
+            await _bot.SendTextMessageAsync(ChatId, "Переключено на " + Entity.Data);
         }
     }
 }
