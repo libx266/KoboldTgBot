@@ -1,6 +1,8 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Errors;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.Extensions.Utils;
+using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
@@ -95,17 +97,11 @@ namespace KoboldTgBot.Neuro
 
             await db.Generations.AddAsync(gen);
 
-            var cab = db.Cabinets.First(c => c.UserId == userId);
-            cab.Balance -= (((decimal)gen.PromptTokens / 1000) * cab.PromptTokenPrice + ((decimal)gen.CompletionTokens / 1000) * cab.CompletionTokenPrice);
-
-            if (cab.Balance < 0)
-            {
-                cab.IsGpt4o = false;
-            }
+            var balance = await db.UpdateCabinetBalanceAsync(userId, gen.PromptTokens, gen.CompletionTokens);
 
             await db.SaveChangesAsync();
 
-            return cab.Balance > 0 ? text : "Ваш баланс отрицательный, модель переключена на " + CommandBalance.LLama3;
+            return balance > 0 ? text : "Ваш баланс отрицательный, модель переключена на " + CallbackSelectModel.LLama3;
         }
 
         internal static async Task<string> GenerateAsync(PromptDto prompt, long userId, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
@@ -128,14 +124,12 @@ namespace KoboldTgBot.Neuro
 
                 using var db = new DataContext();
 
-                var cab = db.Cabinets.FirstOrDefault(c => c.UserId == userId);
-
                 string? text = await new[]
                 {
                     () => SendRequestLocal(promptText, stop, maxLength, temperature, topPSampling, repetitionPenalty),
                     () => SendRequestGpt4o(promptText, userId, stop, maxLength, temperature)
                 }
-                [Convert.ToInt32((cab?.IsGpt4o ?? false) && (cab?.Balance ?? 0m) > 0m)]();
+                [Convert.ToInt32(await db.IsGpt4oEnable(userId))]();
 
                 if (string.IsNullOrEmpty(text = LLMProcessingHelper.Filter(text, stop)))
                 {

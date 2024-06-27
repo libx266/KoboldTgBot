@@ -1,11 +1,11 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.TgBot.Objects;
 using KoboldTgBot.TgBot.States;
-using KoboldTgBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -20,7 +20,6 @@ namespace KoboldTgBot.TgBot
         private readonly StateMachineCreateRole _smCreateRole = new();
         private readonly StateMachineMultiMessage _smMultiMessage = new();
 
-        private readonly Dictionary<long, bool> _gpt4o = new();
         private readonly Queue<Func<Task>> _llama3 = new();
 
         internal TelegramBot(string token) =>
@@ -29,7 +28,6 @@ namespace KoboldTgBot.TgBot
         internal async void StartPooling()
         {
             _bot.StartReceiving(HandleUpdateAsync, async (bot, ex, cancel) => await Task.Run(() => ex.Log()));
-            _gpt4o.Add(7098926305L, true);
 
             while (true)
             {
@@ -55,15 +53,6 @@ namespace KoboldTgBot.TgBot
             {
                 result.Error.Log();
             }
-        }
-
-        private bool IsGpt4oCommand(string? text)
-        {
-            var gpt4Exist = () =>  !string.IsNullOrEmpty(ConfigurationManager.Gpt4oSecret);
-            var  validInput = () => !string.IsNullOrEmpty(text);
-            var validCmd = () => text!.StartsWith('/' + ConfigurationManager.Gpt4oSecret);
-
-            return gpt4Exist() && validInput() && validCmd();
         }
 
         private async Task HandleCommandAsync(Message message)
@@ -95,9 +84,6 @@ namespace KoboldTgBot.TgBot
                 else if (_smMultiMessage.IsEnable(message.Chat.Id, out var _))
                 {
                     cmd = factory.Create<CommandMultiMessage>(_smMultiMessage);
-                }
-                else if (IsGpt4oCommand(message.Text))
-                {
                 }
                 else if (message.Text.StartsWith('/'))
                 {
@@ -136,7 +122,7 @@ namespace KoboldTgBot.TgBot
             await ExecuteAction(clb);
         }
 
-        private void HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)
+        private async void HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken token)
         {
             var task = async () =>
             {
@@ -150,20 +136,16 @@ namespace KoboldTgBot.TgBot
                 }
             };
 
-            long userId = update.Message?.From?.Id ?? update.CallbackQuery!.From.Id;
-
             using var db = new DataContext();
-
-            var cab = db.Cabinets.FirstOrDefault(c => c.UserId == userId);
 
             if
             (
-                ((cab?.IsGpt4o ?? false) && (cab?.Balance ?? 0) > 0) || 
+                await db.IsGpt4oEnable(update.Message?.From?.Id ?? update.CallbackQuery!.From.Id) || 
                 update.Message?.Text == CommandBalance.Name ||
-                update?.CallbackQuery?.Data?.Split('=').FirstOrDefault() == CallbackSelectModel.Name
+                update?.CallbackQuery?.Data?.Split('=')?.FirstOrDefault() == CallbackSelectModel.Name
             )
             {
-                Task.Run(task);
+                var _ = Task.Run(task);
             }
             else
             {
