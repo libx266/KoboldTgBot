@@ -52,5 +52,17 @@ namespace KoboldTgBot.Extensions.Database
                 select new MessageShortDto(m2.Text, m2.UserId)
             ).ToList();
         }
+
+        internal static async Task<int?> DeleteLastMessage(this DataContext db, long chatId)
+        {
+            var msg = await db.Messages.OrderByDescending(m => m.ID).FirstOrDefaultAsync(m => m.ChatId == chatId && m.InMemory);
+            if (msg != default)
+            {
+                msg.InMemory = false;
+                await db.SaveChangesAsync();
+                return msg.TgId;
+            }
+            return default;
+        }
     }
 }

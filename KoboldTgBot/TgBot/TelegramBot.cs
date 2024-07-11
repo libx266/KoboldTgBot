@@ -97,6 +97,7 @@ namespace KoboldTgBot.TgBot
                         CommandMultiMessage.Name => factory.Create<CommandMultiMessage>(_smMultiMessage),
                         CommandMore.Name => factory.Create<CommandMore>(),
                         CommandBalance.Name => factory.Create<CommandBalance>(),
+                        CommandDelete.Name => factory.Create<CommandDelete>(),
                         _ => factory.Create<CommandUnknown>()
                     };
                 }

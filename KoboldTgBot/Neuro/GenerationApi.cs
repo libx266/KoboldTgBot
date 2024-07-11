@@ -136,7 +136,7 @@ namespace KoboldTgBot.Neuro
                     throw new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
                 }
 
-                return text;
+                return LLMProcessingHelper.RemoveEmojis(text);
             }
             catch (Exception ex)
             {
