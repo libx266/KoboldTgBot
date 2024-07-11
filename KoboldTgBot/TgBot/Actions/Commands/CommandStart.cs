@@ -21,12 +21,14 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                     new KeyboardButton(CommandClear.Name),
                     new KeyboardButton(CommandRegen.Name),
                     new KeyboardButton(CommandEdit.Name),
+                    new KeyboardButton(CommandDelete.Name),
                 },
                 new []
                 {
                     new KeyboardButton(CommandMultiMessage.Name),
                     new KeyboardButton(CommandMore.Name),
-                    new KeyboardButton(CommandRole.Name)
+                    new KeyboardButton(CommandRole.Name),
+                    new KeyboardButton(CommandBalance.Name)
                 }
 
                 
