@@ -126,7 +126,7 @@ namespace KoboldTgBot.Neuro
 
                 string? text = await new[]
                 {
-                    () => SendRequestLocal(promptText, stop, maxLength, temperature, topPSampling, repetitionPenalty),
+                    () => SendRequestLocal(promptText, stop, 512, temperature, topPSampling, repetitionPenalty),
                     () => SendRequestGpt4o(promptText, userId, stop, maxLength, temperature)
                 }
                 [Convert.ToInt32(await db.IsGpt4oEnable(userId))]();

@@ -28,7 +28,7 @@ namespace KoboldTgBot.Extensions.Utils
 
                 count += row.Length;
 
-                if (count > 21504)
+                if (count > 25600)
                 {
                     break;
                 }
