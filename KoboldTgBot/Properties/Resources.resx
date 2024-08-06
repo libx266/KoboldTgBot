@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="NeuroCharacterPrompt" xml:space="preserve">
-    <value>### Instruction:
+    <value>&lt;s&gt;[INST]
 Вот твоя анкета:
 ```
 Имя:  {0}
@@ -133,12 +133,11 @@
 Стиль общения:  {5}
 ```
 
-Отвечать всегда следует на русском языке, это главное правило! Тебе необходимо продолжить следующий диалог:
+Отвечать всегда следует на русском языке, это главное правило! Свое имя в ответе упоминать не нужно. Тебе необходимо продолжить следующий диалог:
 ```
 {6}
 ```
-
-### Response:</value>
+[/INST] &lt;/s&gt;</value>
   </data>
   <data name="RoleViewInfo" xml:space="preserve">
     <value>Имя:  {0}

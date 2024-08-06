@@ -16,7 +16,7 @@ namespace KoboldTgBot.Neuro
         {
             using var http = new HttpClient();
 
-            http.Timeout = TimeSpan.FromMinutes(20);
+            http.Timeout = TimeSpan.FromHours(1);
 
             var endpoint = ConfigurationManager.NeuroApiEndpoint + "completions";
 
@@ -126,7 +126,7 @@ namespace KoboldTgBot.Neuro
 
                 string? text = await new[]
                 {
-                    () => SendRequestLocal(promptText, stop, 512, temperature, topPSampling, repetitionPenalty),
+                    () => SendRequestLocal(promptText, stop, maxLength, temperature, topPSampling, repetitionPenalty),
                     () => SendRequestGpt4o(promptText, userId, stop, maxLength, temperature)
                 }
                 [Convert.ToInt32(await db.IsGpt4oEnable(userId))]();

@@ -41,7 +41,7 @@ namespace KoboldTgBot.Extensions.Database
 
         internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredListAsync(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(384).ToListAsync();
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(1024).ToListAsync();
 
             return
             (
