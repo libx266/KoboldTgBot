@@ -3,5 +3,6 @@
   "NeuroApiEndpoint": "http://localhost:5002/api/v1/",
   "TelegramBotToken": "your-tg-bot-token",
   "ProxyAPIToken": "",
-  "Gpt4oSecret":  ""
+  "Gpt4oSecret": "",
+  "PromptTemplate": "<s>[INST]{0}[/INST]</s>"
 }
