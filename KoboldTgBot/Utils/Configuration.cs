@@ -13,6 +13,7 @@ namespace KoboldTgBot.Utils
             public string TelegramBotToken { get; set; }
             public string ProxyAPIToken { get; set; }
             public string Gpt4oSecret { get; set; }
+            public string PromptTemplate { get; set; }
         }
 
         private static readonly Params _params = JsonConvert.DeserializeObject<Params>(File.ReadAllText("config.json"));
@@ -22,5 +23,6 @@ namespace KoboldTgBot.Utils
         public static string TelegramBotToken => _params.TelegramBotToken;
         public static string ProxyAPIToken => _params.ProxyAPIToken;
         public static string Gpt4oSecret => _params.Gpt4oSecret;
+        public static string PromptTemplate => _params.PromptTemplate;
     }
 }

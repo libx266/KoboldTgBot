@@ -1,5 +1,6 @@
 ﻿using KoboldTgBot.Database;
 using KoboldTgBot.Extensions.Database;
+using KoboldTgBot.Utils;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
@@ -38,7 +39,7 @@ namespace KoboldTgBot.Extensions.Utils
 
             dialog.Reverse();
 
-            string prompt = String.Format
+            string prompt = String.Format(ConfigurationManager.PromptTemplate, String.Format
             (
                 Properties.Resources.NeuroCharacterPrompt,
                 role.Name,
@@ -48,7 +49,7 @@ namespace KoboldTgBot.Extensions.Utils
                 role.Relation,
                 role.Style,
                 String.Join("\n", dialog.Append($"{role.Name}:  "))
-            );
+            ));
 
             return new PromptDto(prompt, role.Name, senderName);
         }
