@@ -12,23 +12,26 @@ namespace KoboldTgBot.Extensions.Database
         /// <param name="chatId"></param>
         /// <param name="roleId"></param>
         /// <returns></returns>
-        internal static async Task AcceptRoleAsync(this DataContext db, long chatId, int roleId)
+        internal static async Task<DbCurrentRole> AcceptRoleAsync(this DataContext db, long chatId, int roleId)
         {
             var currentRole = await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId);
 
             if (currentRole is null)
             {
-                await db.CurrentRoles.AddAsync(new DbCurrentRole
+                currentRole = new DbCurrentRole
                 {
                     ChatId = chatId,
                     RoleId = roleId
-                });
+                };
+                await db.CurrentRoles.AddAsync(currentRole);
             }
             else
             {
                 currentRole.RoleId = roleId;
                 currentRole.InsertDate = DateTime.UtcNow;
             }
+
+            return currentRole;
         }
 
         internal static async Task<DbRole> GetCurrentRoleAsync(this DataContext db, long chatId) => await
@@ -38,5 +41,8 @@ namespace KoboldTgBot.Extensions.Database
             where r.ID == (cr == default ? 1 : cr.RoleId)
             select r
         ).FirstAsync();
+
+        internal static async Task<string?> GetUserRoleName(this DataContext db, long chatId) =>
+            (await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId))?.Username;
     }
 }

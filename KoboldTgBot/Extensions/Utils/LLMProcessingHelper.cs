@@ -12,7 +12,7 @@ namespace KoboldTgBot.Extensions.Utils
         {
             string senderName;
 
-            if (string.IsNullOrWhiteSpace(senderName = user!.FirstName ?? "" + ' ' + user.LastName ?? ""))
+            if (string.IsNullOrWhiteSpace(senderName = await db.GetUserRoleName(chatId) ?? (user!.FirstName ?? "" + ' ' + user.LastName ?? "")))
             {
                 senderName = user.Username ?? "Anonymous";
             }

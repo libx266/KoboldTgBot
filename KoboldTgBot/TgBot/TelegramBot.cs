@@ -87,7 +87,12 @@ namespace KoboldTgBot.TgBot
                 }
                 else if (message.Text.StartsWith('/'))
                 {
-                    cmd = message.Text switch
+                    var cmdParites = message.Text.Split(':');
+
+                    string cmdHead = cmdParites.First();
+                    string? cmdBody = cmdParites.LastOrDefault();
+
+                    cmd = cmdHead switch
                     {
                         CommandStart.Name => factory.Create<CommandStart>(),
                         CommandClear.Name => factory.Create<CommandClear>(),
@@ -98,6 +103,7 @@ namespace KoboldTgBot.TgBot
                         CommandMore.Name => factory.Create<CommandMore>(),
                         CommandBalance.Name => factory.Create<CommandBalance>(),
                         CommandDelete.Name => factory.Create<CommandDelete>(),
+                        CommandRename.Name => factory.Create<CommandRename>(cmdBody),
                         _ => factory.Create<CommandUnknown>()
                     };
                 }
