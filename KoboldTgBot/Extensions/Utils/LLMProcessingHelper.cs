@@ -51,7 +51,7 @@ namespace KoboldTgBot.Extensions.Utils
 
             dialog.Reverse();
 
-            return new PromptDto(prompt.Replace("@{dialog}", String.Join("\n", dialog.Append($"{role.Name}:  "))), role.Name, senderName);
+            return new PromptDto(prompt.Replace("@_dialog_@", String.Join("\n", dialog.Append($"{role.Name}:  "))), role.Name, senderName);
         }
 
         private static IEnumerable<char> FilterEmojis(string text)
