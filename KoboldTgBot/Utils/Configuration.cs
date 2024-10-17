@@ -19,6 +19,8 @@ namespace KoboldTgBot.Utils
             public int MaxGenerationLength { get; set; }
             public int MaxContextLength { get; set; }
             public float AverageSymbolsPerToken { get; set; }
+            public string ModelName { get; set; } 
+
         }
 
         private static readonly Params _params = JsonConvert.DeserializeObject<Params>(File.ReadAllText("config.json"));
@@ -34,5 +36,6 @@ namespace KoboldTgBot.Utils
         public static int MaxGenerationLength => _params.MaxGenerationLength;
         public static int MaxContextLength => _params.MaxContextLength;
         public static float AverageSymbolsPerToken => _params.AverageSymbolsPerToken;
+        public static string ModelName => _params.ModelName;
     }
 }

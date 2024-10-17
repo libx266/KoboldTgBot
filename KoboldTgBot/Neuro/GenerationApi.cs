@@ -7,12 +7,13 @@ using KoboldTgBot.TgBot.Actions.Commands;
 using KoboldTgBot.Utils;
 using Newtonsoft.Json;
 using System.Text;
+using Telegram.Bot.Types;
 
 namespace KoboldTgBot.Neuro
 {
     internal static class GenerationApi
     {
-        private static async Task<string?> SendRequestLocal(string promptText, string[] stop, int maxLength, float temperature, float topPSampling, float repetitionPenalty)
+        private static async Task<string?> SendRequestLocal(string promptText, long userId, string[] stop, int maxLength, float temperature, float topPSampling, float repetitionPenalty)
         {
             using var http = new HttpClient();
 
@@ -39,7 +40,27 @@ namespace KoboldTgBot.Neuro
 
             var answer = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
 
-            return answer?.choices[0].text;
+            string? text = answer?.choices[0].text;
+
+            var gen = new DbGeneration
+            {
+                Answer = text ?? string.Empty,
+                Prompt = promptText,
+                Model = ConfigurationManager.ModelName,
+                UserId = userId,
+                IsLocal = true,
+                Temperature = temperature,
+                RepetitionPenalty = repetitionPenalty,
+                TopPSampling = topPSampling
+            };
+
+            using (var db = new DataContext())
+            {
+                await db.Generations.AddAsync(gen);
+                await db.SaveChangesAsync();
+            }
+
+            return text;
         }
 
         private const string ProxiAPIEndpoint = "https://api.proxyapi.ru/openai/v1/chat/completions";
@@ -92,12 +113,14 @@ namespace KoboldTgBot.Neuro
                 CompletionTokens = answer!.usage.completion_tokens,
                 GenerationId = answer!.id,
                 Model = "gpt-4o",
-                UserId = userId
+                UserId = userId,
+                IsLocal = false,
+                Temperature = temperature
             };
 
             await db.Generations.AddAsync(gen);
 
-            var balance = await db.UpdateCabinetBalanceAsync(userId, gen.PromptTokens, gen.CompletionTokens);
+            var balance = await db.UpdateCabinetBalanceAsync(userId, gen.PromptTokens.Value, gen.CompletionTokens.Value);
 
             await db.SaveChangesAsync();
 
@@ -126,7 +149,7 @@ namespace KoboldTgBot.Neuro
 
                 string? text = await new[]
                 {
-                    () => SendRequestLocal(promptText, stop, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty),
+                    () => SendRequestLocal(promptText, userId, stop, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty),
                     () => SendRequestGpt4o(promptText, userId, stop, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature)
                 }
                 [Convert.ToInt32(await db.IsGpt4oEnable(userId))]();
@@ -135,6 +158,8 @@ namespace KoboldTgBot.Neuro
                 {
                     throw new LLMEmptyAnswerException(promptText, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty);
                 }
+
+                
 
                 return LLMProcessingHelper.RemoveEmojis(text);
             }
