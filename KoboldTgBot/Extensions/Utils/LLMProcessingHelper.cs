@@ -22,6 +22,18 @@ namespace KoboldTgBot.Extensions.Utils
 
             var role = await db.GetCurrentRoleAsync(chatId);
 
+            string prompt = String.Format(ConfigurationManager.PromptTemplate, String.Format
+            (
+                Properties.Resources.NeuroCharacterPrompt,
+                role.Name,
+                role.Gender,
+                role.Character,
+                role.Specialisation,
+                role.Relation,
+                role.Style
+            ));
+
+            int max = Convert.ToInt32((ConfigurationManager.MaxContextLength - (ConfigurationManager.MaxGenerationLength + prompt.Length / ConfigurationManager.AverageSymbolsPerToken)) * ConfigurationManager.AverageSymbolsPerToken);
 
             foreach (var m in await db.GetMessagesShortFilteredListAsync(chatId, role.ID))
             {
@@ -29,7 +41,7 @@ namespace KoboldTgBot.Extensions.Utils
 
                 count += row.Length;
 
-                if (count > 25600 * 4)
+                if (count > max)
                 {
                     break;
                 }
@@ -39,19 +51,7 @@ namespace KoboldTgBot.Extensions.Utils
 
             dialog.Reverse();
 
-            string prompt = String.Format(ConfigurationManager.PromptTemplate, String.Format
-            (
-                Properties.Resources.NeuroCharacterPrompt,
-                role.Name,
-                role.Gender,
-                role.Character,
-                role.Specialisation,
-                role.Relation,
-                role.Style,
-                String.Join("\n", dialog.Append($"{role.Name}:  "))
-            ));
-
-            return new PromptDto(prompt, role.Name, senderName);
+            return new PromptDto(prompt.Replace("@{dialog}", String.Join("\n", dialog.Append($"{role.Name}:  "))), role.Name, senderName);
         }
 
         private static IEnumerable<char> FilterEmojis(string text)

@@ -4,5 +4,10 @@
   "TelegramBotToken": "your-tg-bot-token",
   "ProxyAPIToken": "",
   "Gpt4oSecret": "",
-  "PromptTemplate": "<s>[INST]{0}[/INST]</s>"
+  "PromptTemplate": "<s>[INST]{0}[/INST]</s>",
+  "Temperature": 0.8,
+  "RepetitionPenalty": 1.1,
+  "TopPSampling": 0.9,
+  "MaxContextLength": 8192,
+  "AverageSymbolsPerToken": 3.5
 }

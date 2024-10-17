@@ -12,7 +12,7 @@ namespace KoboldTgBot.Neuro
 {
     internal static class GenerationApi
     {
-        private static async Task<string?> SendRequestLocal(string promptText, string[] stop, ushort maxLength, float temperature, float topPSampling, float repetitionPenalty)
+        private static async Task<string?> SendRequestLocal(string promptText, string[] stop, int maxLength, float temperature, float topPSampling, float repetitionPenalty)
         {
             using var http = new HttpClient();
 
@@ -44,7 +44,7 @@ namespace KoboldTgBot.Neuro
 
         private const string ProxiAPIEndpoint = "https://api.proxyapi.ru/openai/v1/chat/completions";
 
-        private static async Task<string?> SendRequestGpt4o(string promptText, long userId, string[] stop, ushort maxLength, float temperature)
+        private static async Task<string?> SendRequestGpt4o(string promptText, long userId, string[] stop, int maxLength, float temperature)
         {
             using var http = new HttpClient();
 
@@ -104,7 +104,7 @@ namespace KoboldTgBot.Neuro
             return balance > 0 ? text : "Ваш баланс отрицательный, модель переключена на " + CallbackSelectModel.LLama3;
         }
 
-        internal static async Task<string> GenerateAsync(PromptDto prompt, long userId, ushort maxLength = 1024, float temperature = 0.8f, float topPSampling = 0.925f, float repetitionPenalty = 1.175f, int attempts = 20)
+        internal static async Task<string> GenerateAsync(PromptDto prompt, long userId, int attempts = 20)
         {
             string promptText = LLMProcessingHelper.RemoveEmojis(prompt.Prompt);
             try
@@ -126,14 +126,14 @@ namespace KoboldTgBot.Neuro
 
                 string? text = await new[]
                 {
-                    () => SendRequestLocal(promptText, stop, maxLength, temperature, topPSampling, repetitionPenalty),
-                    () => SendRequestGpt4o(promptText, userId, stop, maxLength, temperature)
+                    () => SendRequestLocal(promptText, stop, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty),
+                    () => SendRequestGpt4o(promptText, userId, stop, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature)
                 }
                 [Convert.ToInt32(await db.IsGpt4oEnable(userId))]();
 
                 if (string.IsNullOrEmpty(text = LLMProcessingHelper.Filter(text, stop)))
                 {
-                    throw new LLMEmptyAnswerException(promptText, maxLength, temperature, topPSampling, repetitionPenalty);
+                    throw new LLMEmptyAnswerException(promptText, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty);
                 }
 
                 return LLMProcessingHelper.RemoveEmojis(text);
@@ -141,7 +141,7 @@ namespace KoboldTgBot.Neuro
             catch (Exception ex)
             {
                 ex.Log();
-                return await GenerateAsync(prompt, userId, maxLength, temperature, topPSampling, repetitionPenalty, attempts - 1);
+                return await GenerateAsync(prompt, userId,  attempts - 1);
             }
         }
     }

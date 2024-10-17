@@ -12,8 +12,13 @@ namespace KoboldTgBot.Utils
             public string NeuroApiEndpoint { get; set; }
             public string TelegramBotToken { get; set; }
             public string ProxyAPIToken { get; set; }
-            public string Gpt4oSecret { get; set; }
             public string PromptTemplate { get; set; }
+            public float Temperature { get; set; }
+            public float RepetitionPenalty { get; set; }
+            public float TopPSampling { get; set; }
+            public int MaxGenerationLength { get; set; }
+            public int MaxContextLength { get; set; }
+            public float AverageSymbolsPerToken { get; set; }
         }
 
         private static readonly Params _params = JsonConvert.DeserializeObject<Params>(File.ReadAllText("config.json"));
@@ -22,7 +27,12 @@ namespace KoboldTgBot.Utils
         public static string NeuroApiEndpoint => _params.NeuroApiEndpoint;
         public static string TelegramBotToken => _params.TelegramBotToken;
         public static string ProxyAPIToken => _params.ProxyAPIToken;
-        public static string Gpt4oSecret => _params.Gpt4oSecret;
         public static string PromptTemplate => _params.PromptTemplate;
+        public static float Temperature => _params.Temperature;
+        public static float RepetitionPenalty => _params.RepetitionPenalty;
+        public static float TopPSampling => _params.TopPSampling;
+        public static int MaxGenerationLength => _params.MaxGenerationLength;
+        public static int MaxContextLength => _params.MaxContextLength;
+        public static float AverageSymbolsPerToken => _params.AverageSymbolsPerToken;
     }
 }

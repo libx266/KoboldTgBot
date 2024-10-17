@@ -4,7 +4,7 @@
     {
         public string Propmpt { get; }
 
-        public ushort MaxLength { get; }
+        public int MaxLength { get; }
 
         public float Temperature { get; }
 
@@ -12,7 +12,7 @@
 
         public float RepetitionPenalty { get; }
 
-        public LLMException(string message, string propmpt, ushort maxLength, float temperature, float topPSampling, float repetitionPenalty) : base(message)
+        public LLMException(string message, string propmpt, int maxLength, float temperature, float topPSampling, float repetitionPenalty) : base(message)
         {
             Propmpt = propmpt;
             MaxLength = maxLength;
