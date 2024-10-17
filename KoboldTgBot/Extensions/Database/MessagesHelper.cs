@@ -13,8 +13,8 @@ namespace KoboldTgBot.Extensions.Database
         /// <returns></returns>
         internal static async Task ClearContextAsync(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.RoleId == roleId && m.InMemory).ToListAsync();
-            messages.ForEach(m => m.InMemory = false);
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.RoleId == roleId && m.Status == MessageStatus.Actual).ToListAsync();
+            messages.ForEach(m => m.Status = MessageStatus.Clear);
         }
 
         /// <summary>
@@ -26,22 +26,21 @@ namespace KoboldTgBot.Extensions.Database
         /// <param name="chatId"></param>
         /// <param name="messageId"></param>
         /// <returns></returns>
-        internal static async Task AddMessageAsync(this DataContext db, string text, long userId, long chatId, int messageId, int roleId, bool isEdited = false) => await db.Messages.AddAsync(new DbMessage
+        internal static async Task AddMessageAsync(this DataContext db, string text, long userId, long chatId, int messageId, int roleId) => await db.Messages.AddAsync(new DbMessage
         {
             Text = text,
             UserId = userId,
             ChatId = chatId,
             TgId = messageId,
             RoleId = roleId,
-            IsEdited = isEdited
         });
 
         internal static async Task<DbMessage?> GetLastBotMessageAsync(this DataContext db, long chatId, int roleId) =>
-            await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.UserId == -1L && m.RoleId == roleId).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
+            await db.Messages.Where(m => m.ChatId == chatId && m.Status == MessageStatus.Actual && m.UserId == -1L && m.RoleId == roleId).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
         internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredListAsync(this DataContext db, long chatId, int roleId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.InMemory && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(1024).ToListAsync();
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.Status == MessageStatus.Actual && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(1024).ToListAsync();
 
             return
             (
@@ -55,10 +54,10 @@ namespace KoboldTgBot.Extensions.Database
 
         internal static async Task<int?> DeleteLastMessage(this DataContext db, long chatId)
         {
-            var msg = await db.Messages.OrderByDescending(m => m.ID).FirstOrDefaultAsync(m => m.ChatId == chatId && m.InMemory);
+            var msg = await db.Messages.OrderByDescending(m => m.ID).FirstOrDefaultAsync(m => m.ChatId == chatId && m.Status == MessageStatus.Actual);
             if (msg != default)
             {
-                msg.InMemory = false;
+                msg.Status = MessageStatus.Deleted | MessageStatus.Clear;
                 await db.SaveChangesAsync();
                 return msg.TgId;
             }

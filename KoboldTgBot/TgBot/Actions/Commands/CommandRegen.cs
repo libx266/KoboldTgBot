@@ -23,7 +23,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
             if (lastMessage is not null)
             {
-                lastMessage.InMemory = false;
+                lastMessage.Status = MessageStatus.Regenerated | MessageStatus.Clear;
                 await db.SaveChangesAsync();
 
                 string answer = await GenerateAsync(db);

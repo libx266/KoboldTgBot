@@ -14,7 +14,6 @@ namespace KoboldTgBot.Database
         public long ChatId { get; set; }
         public int RoleId { get; set; } = 1;
         public int TgId { get; set; }
-        public bool IsEdited { get; set; } = false;
-        public bool InMemory { get; set; } = true;
+        public MessageStatus Status { get; set; } = MessageStatus.Actual;
     }
 }

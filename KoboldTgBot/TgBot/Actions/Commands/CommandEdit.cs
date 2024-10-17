@@ -40,8 +40,8 @@ namespace KoboldTgBot.TgBot.Actions.Commands
                 {
                     await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, $"🇵🇱 {Text}");
 
-                    await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, role.ID, true);
-                    lastMessage.InMemory = false;
+                    await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, role.ID);
+                    lastMessage.Status = MessageStatus.Edited | MessageStatus.Clear;
 
                     await db.SaveChangesAsync();
 

@@ -77,7 +77,7 @@ namespace KoboldTgBot.Properties {
         ///
         ///Отвечать всегда следует на русском языке, это главное правило! Свое имя в ответе упоминать не нужно. Тебе необходимо продолжить следующий диалог:
         ///```
-        ///@{dialog}
+        ///@_dialog_@
         ///```.
         /// </summary>
         internal static string NeuroCharacterPrompt {
