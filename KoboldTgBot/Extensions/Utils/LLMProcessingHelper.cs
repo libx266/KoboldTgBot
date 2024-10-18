@@ -10,17 +10,17 @@ namespace KoboldTgBot.Extensions.Utils
     {
         internal static async Task<PromptDto> ConstructPropmptAsync(this DataContext db, long chatId, User? user)
         {
+            var role = await db.GetCurrentRoleAsync(chatId);
+
             string senderName;
 
-            if (string.IsNullOrWhiteSpace(senderName = await db.GetUserRoleName(chatId) ?? (user!.FirstName ?? "" + ' ' + user.LastName ?? "")))
+            if (string.IsNullOrWhiteSpace(senderName = await db.GetUserRoleName(chatId, role.ID) ?? (user!.FirstName ?? "" + ' ' + user.LastName ?? "")))
             {
                 senderName = user.Username ?? "Anonymous";
             }
 
             var dialog = new List<string>();
             int count = 0;
-
-            var role = await db.GetCurrentRoleAsync(chatId);
 
             string prompt = String.Format(ConfigurationManager.PromptTemplate, String.Format
             (

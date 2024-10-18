@@ -42,7 +42,7 @@ namespace KoboldTgBot.Extensions.Database
             select r
         ).FirstAsync();
 
-        internal static async Task<string?> GetUserRoleName(this DataContext db, long chatId) =>
-            (await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId))?.Username;
+        internal static async Task<string?> GetUserRoleName(this DataContext db, long chatId, int roleId) =>
+            (await db.CurrentRoles.FirstOrDefaultAsync(cr => cr.ChatId == chatId && cr.RoleId == roleId))?.Username;
     }
 }
