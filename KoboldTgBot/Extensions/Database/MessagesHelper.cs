@@ -1,4 +1,5 @@
 ﻿using KoboldTgBot.Database;
+using KoboldTgBot.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace KoboldTgBot.Extensions.Database
@@ -38,9 +39,11 @@ namespace KoboldTgBot.Extensions.Database
         internal static async Task<DbMessage?> GetLastBotMessageAsync(this DataContext db, long chatId, int roleId) =>
             await db.Messages.Where(m => m.ChatId == chatId && m.Status == MessageStatus.Actual && m.UserId == -1L && m.RoleId == roleId).OrderByDescending(m => m.ID).FirstOrDefaultAsync();
 
-        internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredListAsync(this DataContext db, long chatId, int roleId)
+        internal static async Task<List<MessageShortDto>> GetMessagesShortFilteredListAsync(this DataContext db, long chatId, int roleId, long userId)
         {
-            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.Status == MessageStatus.Actual && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(1024).ToListAsync();
+            int take = await db.IsExternalModelEnable(userId) ? Int32.MaxValue : ConfigurationManager.MaxContextLength / Convert.ToInt32(50f / ConfigurationManager.AverageSymbolsPerToken);
+
+            var messages = await db.Messages.Where(m => m.ChatId == chatId && m.Status == MessageStatus.Actual && m.RoleId == roleId).OrderByDescending(m => m.ID).Take(take).ToListAsync();
 
             return
             (

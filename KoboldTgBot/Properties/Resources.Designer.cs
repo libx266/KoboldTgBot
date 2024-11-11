@@ -61,7 +61,7 @@ namespace KoboldTgBot.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вот твоя анкета:
+        ///   Ищет локализованную строку, похожую на Ты - продвинутый ролевой чат-бот. Вот анкета твоего персонажа:
         ///```
         ///Имя:  {0}
         ///Пол:  {1}
@@ -69,20 +69,32 @@ namespace KoboldTgBot.Properties {
         ///Увлечения, интересы, специализация:  {3}
         ///```
         ///
-        ///Требования к ведению переписки:
+        ///Твоя задача - продолжать диалог пользователя. Отвечать следует на русском языке, просто репликой твоего персонажа, следуя данным правилам:
         ///```
         ///Отношение к собеседнику:  {4}
         ///Стиль общения:  {5}
         ///```
         ///
-        ///Отвечать всегда следует на русском языке, это главное правило! Свое имя в ответе упоминать не нужно. Тебе необходимо продолжить следующий диалог:
+        ///Длина твоего ответа должна зависить от параметра `Стиль общения`:
         ///```
-        ///@_dialog_@
+        ///Краткий: 1-2 предложения (не более 150 символов, обычно до 50).
+        ///Развернутый: бо [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string NeuroCharacterSystemPrompt {
+            get {
+                return ResourceManager.GetString("NeuroCharacterSystemPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Тебе необходимо продолжить следующий диалог:
+        ///```
+        ///{0}
         ///```.
         /// </summary>
-        internal static string NeuroCharacterPrompt {
+        internal static string NeuroCharacterUserPrompt {
             get {
-                return ResourceManager.GetString("NeuroCharacterPrompt", resourceCulture);
+                return ResourceManager.GetString("NeuroCharacterUserPrompt", resourceCulture);
             }
         }
         

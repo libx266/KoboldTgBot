@@ -17,7 +17,7 @@ namespace KoboldTgBot.TgBot
         private readonly string _token;
 
         private readonly StateMachineEdit _smEdit = new();
-        private readonly StateMachineCreateRole _smCreateRole = new();
+        private readonly StateMachineCreateRole _smRole = new();
         private readonly StateMachineMultiMessage _smMultiMessage = new();
 
         private readonly Queue<Func<Task>> _llama3 = new();
@@ -67,17 +67,17 @@ namespace KoboldTgBot.TgBot
                 {
                     cmd = factory.Create<CommandEdit>(_smEdit);
                 }
-                else if (_smCreateRole.IsEnable(message.Chat.Id, out var createRoleState))
+                else if (_smRole.IsEnable(message.Chat.Id, out var createRoleState))
                 {
                     cmd = createRoleState switch
                     {
-                        StateCreateRole.Title => factory.Create<CommandCreateRoleStoreTitle>(_smCreateRole),
-                        StateCreateRole.Name => factory.Create<CommandCreateRoleStoreName>(_smCreateRole),
-                        StateCreateRole.Gender => factory.Create<CommandCreateRoleStoreGender>(_smCreateRole),
-                        StateCreateRole.Charakter => factory.Create<CommandCreateRoleStoreCharakter>(_smCreateRole),
-                        StateCreateRole.Specialisation => factory.Create<CommandCreateRoleStoreSpecialisation>(_smCreateRole),
-                        StateCreateRole.Relation => factory.Create<CommandCreateRoleStoreRelation>(_smCreateRole),
-                        StateCreateRole.Style => factory.Create<CommandCreateRoleStoreStyle>(_smCreateRole),
+                        StateCreateRole.Title => factory.Create<CommandCreateRoleStoreTitle>(_smRole),
+                        StateCreateRole.Name => factory.Create<CommandCreateRoleStoreName>(_smRole),
+                        StateCreateRole.Gender => factory.Create<CommandCreateRoleStoreGender>(_smRole),
+                        StateCreateRole.Charakter => factory.Create<CommandCreateRoleStoreCharakter>(_smRole),
+                        StateCreateRole.Specialisation => factory.Create<CommandCreateRoleStoreSpecialisation>(_smRole),
+                        StateCreateRole.Relation => factory.Create<CommandCreateRoleStoreRelation>(_smRole),
+                        StateCreateRole.Style => factory.Create<CommandCreateRoleStoreStyle>(_smRole),
                         _ => cmd
                     };
                 }
@@ -96,7 +96,7 @@ namespace KoboldTgBot.TgBot
                     {
                         CommandStart.Name => factory.Create<CommandStart>(),
                         CommandClear.Name => factory.Create<CommandClear>(),
-                        CommandRole.Name => factory.Create<CommandRole>(),
+                        CommandRole.Name => factory.Create<CommandRole>(_smRole),
                         CommandRegen.Name => factory.Create<CommandRegen>(),
                         CommandEdit.Name => factory.Create<CommandEdit>(_smEdit),
                         CommandMultiMessage.Name => factory.Create<CommandMultiMessage>(_smMultiMessage),
@@ -119,9 +119,9 @@ namespace KoboldTgBot.TgBot
             TgAction<CallbackHandler>? clb = callback.Data!.Split('=').FirstOrDefault() switch
             {
                 CallbackRole.Name => factory.Create<CallbackRole>(),
-                CallbackAcceptRole.Name => factory.Create<CallbackAcceptRole>(),
-                CallbackCreateRole.Name => factory.Create<CallbackCreateRole>(_smCreateRole),
-                CallbackDeleteRole.Name => factory.Create<CallbackDeleteRole>(),
+                CallbackAcceptRole.Name => factory.Create<CallbackAcceptRole>(_smRole),
+                CallbackCreateRole.Name => factory.Create<CallbackCreateRole>(_smRole),
+                CallbackDeleteRole.Name => factory.Create<CallbackDeleteRole>(_smRole),
                 CallbackSelectModel.Name => factory.Create<CallbackSelectModel>(),
                 _ => default
             };
@@ -147,7 +147,7 @@ namespace KoboldTgBot.TgBot
 
             if
             (
-                await db.IsGpt4oEnable(update.Message?.From?.Id ?? update.CallbackQuery!.From.Id) || 
+                await db.IsExternalModelEnable(update.Message?.From?.Id ?? update.CallbackQuery!.From.Id) || 
                 update.Message?.Text == CommandBalance.Name ||
                 update?.CallbackQuery?.Data?.Split('=')?.FirstOrDefault() == CallbackSelectModel.Name
             )

@@ -2,6 +2,9 @@
 using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Objects;
+using KoboldTgBot.Utils;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -13,21 +16,37 @@ namespace KoboldTgBot.TgBot.Actions
         {
         }
 
+        private static string ModelNameBuilder(string name, decimal promptCost, decimal answerCost) =>
+            $"{name} (P: {promptCost}₽, A: {answerCost}₽)";
+
+
         protected async Task SendCabInfoAsync(DataContext db, DbCabinet cab, bool edit = false)
         {
-            bool gpt4oEnable = !cab.IsGpt4o && cab.Balance > 0;
+            IEnumerable<string> models = new[] { ModelNameBuilder(ConfigurationManager.ModelName, 0m, 0m) };
 
-            string model = gpt4oEnable ? CallbackSelectModel.Gpt4o : CallbackSelectModel.LLama3;
+            if (cab.Balance > 0m)
+            {
+                models = models.Concat((await db.Models.ToListAsync()).Select(m => ModelNameBuilder(m.Name, m.Prompt1kTokensCostRub, m.Answer1kTokensCostRub)));
+            }
 
-            var keyboard = new InlineKeyboardMarkup(TgHelper.MakeInlineButton<CallbackSelectModel>("Переключить на " + model, model));
+            var buttons = models.Select(model => new[] { TgHelper.MakeInlineButton<CallbackSelectModel>(model, model.Split(' ').First()) });
+
+            var keyboard = new InlineKeyboardMarkup(buttons.ToArray());
+
+            var model = await db.Models.Where(m => m.ID == cab.ModelType).Select(m => m.Name).FirstOrDefaultAsync();
+
+            string text = "Ваш баланс:  " + cab.Balance +
+                "₽\nИспользуемая модель:  " + (model ?? ConfigurationManager.ModelName) +
+                "\nВаш ID:  " + UserId +
+                "\n\nВы можете выбрать модель из списка.\nЦена указана в формате: \nP - Цена за 1k токенов вашего запроса,\nA - Цена за 1k токенов ответа модели.";
 
             if (edit)
             {
-                await _bot.EditMessageTextAsync(ChatId, MessageId, "Ваш баланс:  " + cab.Balance, replyMarkup: keyboard);
+                await _bot.EditMessageTextAsync(ChatId, MessageId, text, replyMarkup: keyboard);
             }
             else
             {
-                await _bot.SendTextMessageAsync(ChatId, "Ваш баланс:  " + cab.Balance, replyMarkup: keyboard);
+                await _bot.SendTextMessageAsync(ChatId, text, replyMarkup: keyboard);
             }
         }
     }

@@ -21,6 +21,8 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             await _bot.EditMessageTextAsync(ChatId, MessageId, "Введите название роли");
 
+            await DeleteMessages(MessageId);
+
             AddMessageToDelete(MessageId);
         }
     }

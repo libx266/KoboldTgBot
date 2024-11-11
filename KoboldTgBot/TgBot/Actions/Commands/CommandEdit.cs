@@ -38,7 +38,7 @@ namespace KoboldTgBot.TgBot.Actions.Commands
 
                 if (lastMessage is not null)
                 {
-                    await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, $"🇵🇱 {Text}");
+                    await _bot.EditMessageTextAsync(lastMessage.ChatId, lastMessage.TgId, "⸙ " + Text);
 
                     await db.AddMessageAsync(Text, lastMessage.UserId, ChatId, lastMessage.TgId, role.ID);
                     lastMessage.Status = MessageStatus.Edited | MessageStatus.Clear;

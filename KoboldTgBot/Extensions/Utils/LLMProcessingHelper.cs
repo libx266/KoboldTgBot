@@ -14,7 +14,7 @@ namespace KoboldTgBot.Extensions.Utils
 
             if (string.IsNullOrWhiteSpace(senderName = await db.GetUserRoleName(chatId) ?? (user!.FirstName ?? "" + ' ' + user.LastName ?? "")))
             {
-                senderName = user.Username ?? "Anonymous";
+                senderName = user?.Username ?? "Anonymous";
             }
 
             var dialog = new List<string>();
@@ -22,20 +22,20 @@ namespace KoboldTgBot.Extensions.Utils
 
             var role = await db.GetCurrentRoleAsync(chatId);
 
-            string prompt = String.Format(ConfigurationManager.PromptTemplate, String.Format
+            string systemPrompt = String.Format
             (
-                Properties.Resources.NeuroCharacterPrompt,
+                Properties.Resources.NeuroCharacterSystemPrompt,
                 role.Name,
                 role.Gender,
                 role.Character,
                 role.Specialisation,
                 role.Relation,
                 role.Style
-            ));
+            );
 
-            int max = Convert.ToInt32((ConfigurationManager.MaxContextLength - (ConfigurationManager.MaxGenerationLength + prompt.Length / ConfigurationManager.AverageSymbolsPerToken)) * ConfigurationManager.AverageSymbolsPerToken);
+            int max = Convert.ToInt32((ConfigurationManager.MaxContextLength - (ConfigurationManager.MaxGenerationLength + (systemPrompt.Length + 150) / ConfigurationManager.AverageSymbolsPerToken)) * ConfigurationManager.AverageSymbolsPerToken);
 
-            foreach (var m in await db.GetMessagesShortFilteredListAsync(chatId, role.ID))
+            foreach (var m in await db.GetMessagesShortFilteredListAsync(chatId, role.ID, user?.Id ?? default))
             {
                 string row = $"{new[] { senderName, role.Name }[Convert.ToInt32(m.Sender == -1)]}:  {m.Text}";
 
@@ -51,7 +51,9 @@ namespace KoboldTgBot.Extensions.Utils
 
             dialog.Reverse();
 
-            return new PromptDto(prompt.Replace("@_dialog_@", String.Join("\n", dialog.Append($"{role.Name}:  "))), role.Name, senderName);
+            string userPrompt = String.Format(Properties.Resources.NeuroCharacterUserPrompt, String.Join("\n", dialog.Append($"{role.Name}:  ")));
+
+            return new PromptDto(String.Format(ConfigurationManager.PromptTemplate, systemPrompt, userPrompt), role.Name, senderName);
         }
 
         private static IEnumerable<char> FilterEmojis(string text)
@@ -73,6 +75,12 @@ namespace KoboldTgBot.Extensions.Utils
         internal static string RemoveEmojis(string text) =>
             String.Join(default(string), FilterEmojis(text));
 
+        private static readonly List<string> _garbage = new()
+        {
+            "<start_of_turn>model",
+            "<end_of_turn>"
+        };
+
         private static int GetLastApostrophIndex(string text, out int count)
         {
             count = 0;
@@ -89,7 +97,7 @@ namespace KoboldTgBot.Extensions.Utils
             return -1;
         }
 
-        internal static string? Filter(string? text, string[] stop)
+        internal static string? Filter(string? text, string[] stop, string botName)
         {
             var check = () =>
             {
@@ -101,9 +109,14 @@ namespace KoboldTgBot.Extensions.Utils
 
             try
             {
+                text = text?.Replace(botName, "");
+
                 check();
 
                 stop.ToList().ForEach(s => text = text!.Replace(s, ""));
+                check();
+
+                _garbage.ForEach(s => text = text!.Replace(s, ""));
                 check();
 
                 if (text!.StartsWith("```"))

@@ -6,6 +6,8 @@ namespace KoboldTgBot.Utils
 
     public static class ConfigurationManager
     {
+        private const string _path = "config.json";
+
         private class Params
         {
             public string DatabaseConnectionString { get; set; }
@@ -23,7 +25,7 @@ namespace KoboldTgBot.Utils
 
         }
 
-        private static readonly Params _params = JsonConvert.DeserializeObject<Params>(File.ReadAllText("config.json"));
+        private static Params _params => JsonConvert.DeserializeObject<Params>(File.ReadAllText("config.json"));
 
         public static string DatabaseConnectionString => _params.DatabaseConnectionString;
         public static string NeuroApiEndpoint => _params.NeuroApiEndpoint;

@@ -37,10 +37,15 @@ namespace KoboldTgBot.TgBot.Actions
         protected void AddMessageToDelete(int messageId) =>
             GetStateMachine().MessagesToDelete.AddItem(ChatId, messageId);
 
-        protected async Task DeleteMessages()
+        protected async Task DeleteMessages(int? exclude = default)
         {
             foreach (int m in GetStateMachine().MessagesToDelete.GetItems(ChatId))
             {
+                if (exclude.HasValue && m == exclude)
+                {
+                    continue;
+                }
+
                 try
                 {
                     await _bot.DeleteMessageAsync(ChatId, m);

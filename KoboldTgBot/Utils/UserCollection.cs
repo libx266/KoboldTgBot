@@ -2,7 +2,7 @@
 {
     internal sealed class UserCollection<T>
     {
-        private readonly Dictionary<long, List<T>> _store = new();
+        private readonly Dictionary<long, HashSet<T>> _store = new();
 
         internal void AddItem(long chatId, T item)
         {
@@ -12,12 +12,12 @@
             }
             else
             {
-                _store.Add(chatId, new List<T> { item });
+                _store.Add(chatId, new HashSet<T> { item });
             }
         }
 
-        internal List<T> GetItems(long chatId) =>
-            _store.TryGetValue(chatId, out var r) ? r : new List<T>();
+        internal HashSet<T> GetItems(long chatId) =>
+            _store.TryGetValue(chatId, out var r) ? r : new HashSet<T>();
 
         internal void ClearItems(long chatId) =>
             _store.Remove(chatId);

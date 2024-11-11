@@ -8,10 +8,11 @@ namespace KoboldTgBot.Extensions.Database
         internal static async Task<DbCabinet?> GetCabinetAsync(this DataContext db, long userId) =>
             await db.Cabinets.FirstOrDefaultAsync(c => c.UserId == userId);
 
-        internal static async Task<bool> IsGpt4oEnable(this DataContext db, long userId)
+
+        internal static async Task<bool> IsExternalModelEnable(this DataContext db, long userId)
         {
             var cab = await GetCabinetAsync(db, userId);
-            return (cab?.IsGpt4o ?? false) && (cab?.Balance ?? 0) > 0;
+            return Convert.ToBoolean(cab?.ModelType ?? default);
         }
 
         /// <summary>
@@ -44,11 +45,13 @@ namespace KoboldTgBot.Extensions.Database
         internal static async Task<decimal> UpdateCabinetBalanceAsync(this DataContext db, long userId, decimal promptTokens, decimal completionTokens)
         {
             var cab = await GetCabinetAsync(db, userId);
-            cab!.Balance -= ((promptTokens / 1000m) * cab.PromptTokenPrice + (completionTokens / 1000m) * cab.CompletionTokenPrice);
+            var model = await db.Models.FirstOrDefaultAsync(m => m.ID == cab!.ModelType);
+
+            cab!.Balance -= ((promptTokens / 1000m) * model.Prompt1kTokensCostRub + (completionTokens / 1000m) * model.Answer1kTokensCostRub);
 
             if (cab.Balance < 0)
             {
-                cab.IsGpt4o = false;
+                cab.ModelType = default;
             }
 
             return cab.Balance;

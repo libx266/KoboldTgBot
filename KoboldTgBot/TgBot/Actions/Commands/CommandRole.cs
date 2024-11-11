@@ -3,14 +3,16 @@ using KoboldTgBot.Extensions.Database;
 using KoboldTgBot.Extensions.Utils;
 using KoboldTgBot.TgBot.Actions.Callbacks;
 using KoboldTgBot.TgBot.Objects;
+using KoboldTgBot.TgBot.States;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace KoboldTgBot.TgBot.Actions.Commands
 {
-    internal sealed class CommandRole : TgAction<MessageHandler>
+    internal sealed class CommandRole : TgStatedAction<MessageHandler, StateCreateRole, StateMachineCreateRole>
     {
         public const string Name = "/role";
+        private const int RolesPerPage = 10;
 
         public CommandRole(ITelegramBotClient bot, MessageHandler entity) : base(bot, entity)
         {
@@ -20,31 +22,46 @@ namespace KoboldTgBot.TgBot.Actions.Commands
         {
             using var db = new DataContext();
 
-            var buttons = new List<List<InlineKeyboardButton>>();
+            var roles = await db.GetRoleShortListAsync(UserId);
+            var totalPages = (int)Math.Ceiling((double)roles.Count / (double)RolesPerPage);
 
-            int index = 0;
-
-            Action<InlineKeyboardButton> AddButton = b =>
+            for (var page = 1; page <= totalPages; page++)
             {
-                if (Convert.ToBoolean(index % 2))
+                var buttons = new List<List<InlineKeyboardButton>>();
+                var index = 0;
+
+                Action<InlineKeyboardButton> AddButton = b =>
                 {
-                    buttons.Last().Add(b);
-                }
-                else
+                    if (Convert.ToBoolean(index % 2))
+                    {
+                        buttons.Last().Add(b);
+                    }
+                    else
+                    {
+                        buttons.Add(new List<InlineKeyboardButton>() { b });
+                    }
+
+                    index++;
+                };
+
+                var startIndex = (page - 1) * RolesPerPage;
+                var endIndex = Math.Min(startIndex + RolesPerPage, roles.Count);
+
+                for (var i = startIndex; i < endIndex; i++)
                 {
-                    buttons.Add(new List<InlineKeyboardButton>() { b });
+                    var role = roles[i];
+                    AddButton(TgHelper.MakeInlineButton<CallbackRole>(role.Title, role.ID));
                 }
 
-                index++;
-            };
+                if (page == totalPages)
+                {
+                    AddButton(TgHelper.MakeInlineButton<CallbackCreateRole>("Добавить"));
+                }
 
-            (await db.GetRoleShortListAsync(UserId)).ForEach(r => AddButton(TgHelper.MakeInlineButton<CallbackRole>(r.Title, r.ID)));
+                var keyboard = new InlineKeyboardMarkup(buttons);
 
-            AddButton(TgHelper.MakeInlineButton<CallbackCreateRole>("Добавить"));
-
-            var keyboard = new InlineKeyboardMarkup(buttons);
-
-            await _bot.SendTextMessageAsync(ChatId, "Выберите роль персонажа:", replyMarkup: keyboard);
+                AddMessageToDelete((await _bot.SendTextMessageAsync(ChatId, $"Выберите роль персонажа (страница {page} из {totalPages}):", replyMarkup: keyboard)).MessageId);
+            }
         }
     }
 }
