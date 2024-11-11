@@ -26,7 +26,7 @@ namespace KoboldTgBot.TgBot.Actions
 
             if (cab.Balance > 0m)
             {
-                models = models.Concat((await db.Models.ToListAsync()).Select(m => ModelNameBuilder(m.Name, m.Prompt1kTokensCostRub, m.Answer1kTokensCostRub)));
+                models = models.Concat((await db.Models.OrderBy(m => m.ID).ToListAsync()).Select(m => ModelNameBuilder(m.Name, m.Prompt1kTokensCostRub, m.Answer1kTokensCostRub)));
             }
 
             var buttons = models.Select(model => new[] { TgHelper.MakeInlineButton<CallbackSelectModel>(model, model.Split(' ').First()) });
