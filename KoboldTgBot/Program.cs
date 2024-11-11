@@ -14,4 +14,6 @@ while (true)
         "clear" => () => Console.Clear(),
         _ => default
     };
+
+    cmd?.Invoke();
 }
