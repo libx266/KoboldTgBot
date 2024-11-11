@@ -6,10 +6,12 @@ bot.StartPooling();
 
 Console.WriteLine("Bot started.");
 
-Action? cmd = Console.ReadLine() switch
-{
-    "clear" => () => Console.Clear(),
-    _ => default
-};
 
-while (true) { cmd?.Invoke(); }
+while (true) 
+{
+    Action? cmd = Console.ReadLine() switch
+    {
+        "clear" => () => Console.Clear(),
+        _ => default
+    };
+}
