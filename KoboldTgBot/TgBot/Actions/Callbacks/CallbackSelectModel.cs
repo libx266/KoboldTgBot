@@ -26,7 +26,9 @@ namespace KoboldTgBot.TgBot.Actions.Callbacks
 
             await db.SaveChangesAsync();
 
-            await SendCabInfoAsync(db, cab, true);
+            await _bot.DeleteMessageAsync(ChatId, MessageId);
+
+            await _bot.SendTextMessageAsync(ChatId, "Выбрана модель:  " + Entity.Data);
         }
     }
 }
