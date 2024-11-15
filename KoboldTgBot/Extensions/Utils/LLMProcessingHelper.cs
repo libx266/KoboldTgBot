@@ -97,7 +97,10 @@ namespace KoboldTgBot.Extensions.Utils
             return -1;
         }
 
-        internal static string? Filter(string? text, string[] stop, string botName)
+        private static bool IsEng(string text) =>
+            text.Any(c => (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+
+        internal static string? Filter(string? text, string[] stop, string botName, bool ruOnly = false)
         {
             var check = () =>
             {
@@ -109,6 +112,11 @@ namespace KoboldTgBot.Extensions.Utils
 
             try
             {
+                if (ruOnly && IsEng(text ?? ""))
+                {
+                    throw new Exception("Eng text");
+                }
+
                 text = text?.Replace(botName, "");
 
                 check();

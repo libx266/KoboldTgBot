@@ -244,7 +244,9 @@ namespace KoboldTgBot.Neuro
                 }
                 [Convert.ToInt32(await db.IsExternalModelEnable(userId))]();
 
-                if (string.IsNullOrEmpty(text = LLMProcessingHelper.Filter(text, stop, LLMProcessingHelper.RemoveEmojis(prompt.BotName) + ':')))
+                bool ruOnly = await db.CurrentRoles.Where(x => x.ChatId == userId).Select(x => x.RuOnly).FirstOrDefaultAsync();
+
+                if (string.IsNullOrEmpty(text = LLMProcessingHelper.Filter(text, stop, LLMProcessingHelper.RemoveEmojis(prompt.BotName) + ':', ruOnly)))
                 {
                     throw new LLMEmptyAnswerException(promptText, ConfigurationManager.MaxGenerationLength, ConfigurationManager.Temperature, ConfigurationManager.TopPSampling, ConfigurationManager.RepetitionPenalty);
                 }

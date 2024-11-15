@@ -104,6 +104,7 @@ namespace KoboldTgBot.TgBot
                         CommandBalance.Name => factory.Create<CommandBalance>(),
                         CommandDelete.Name => factory.Create<CommandDelete>(),
                         CommandRename.Name => factory.Create<CommandRename>(cmdBody),
+                        CommandRuOnly.Name => factory.Create<CommandRuOnly>(),
                         _ => factory.Create<CommandUnknown>()
                     };
                 }
